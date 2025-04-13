@@ -1,0 +1,53 @@
+{
+  "name": "interaction-2-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/recorder.js",
+  "sideEffects": true,
+  "scripts": {
+    "ts:init": "tsc --init",
+    "storybook": "start-storybook -p 6006 --open",
+    "check": "tsc --noEmit",
+    "dev": "node esbuild.config.js",
+    "build": "tsc --noEmit && node esbuild.config.js",
+    "start": "node dist/cli.js"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "storybook-addon": "./dist/recorder.js",
+      "default": "./dist/recorder.js"
+    },
+    "./dist/recorder.js": "./dist/recorder.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "peerDependencies": {
+    "svelte": "3.49.0"
+  },
+  "dependencies": {
+    "@storybook/addons": "^6.5.12",
+    "@storybook/components": "^6.5.12",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.27.0",
+    "@babel/core": "^7.26.10",
+    "@babel/preset-env": "^7.26.9",
+    "@babel/preset-react": "^7.26.3",
+    "@babel/preset-typescript": "^7.27.0",
+    "@types/react": "^19.1.1",
+    "babel-loader": "^10.0.0",
+    "concurrently": "^6.4.0",
+    "esbuild": "^0.25.2",
+    "typescript": "^5.8.3"
+  },
+  "storybook": {
+    "displayName": "Interaction 2 Test",
+    "unsupportedFrameworks": [
+      "react-native"
+    ]
+  }
+}
