@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import { AddonPanel } from '@storybook/components';
 
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import Alert from '@mui/material/Alert';
+import Snackbar from "@mui/material/Snackbar";
+
 import {
   RadioButtonChecked as RadioButtonCheckedIcon,
   Stop as StopIcon,
@@ -24,16 +26,17 @@ export default ({ active } : { active: boolean }) => {
   
     });
   };
-  
-  const parseElementViaUserEvent = (e: Event) => {
+
+  // Wrap the event handler with useCallback so that its reference remains stable.
+  const parseElementViaUserEvent = useCallback((e: Event) => {
     const elementWithDataTestId = onElementClick(e);
     if (!elementWithDataTestId) {
-      console.log('e?.target', e?.target);
-      setAlert((prev) => [ ...prev, `${(e?.target as any)?.nodeName} doesn't have a data-testid or any of its parent element` ]);
+      setAlert((prev) => [ ...prev, `${(e?.target as any)?.nodeName} doesn't have a data-testid and neither do its parent elements` ]);
       return;
     }
-    console.log('STILL LOGGED?')
-  };
+
+    // TODO: collate user flow into coherent dataset for processing
+  }, []);
   
   const toggleListener = (status: Status) => {
     // get the iframe content window
@@ -65,7 +68,6 @@ export default ({ active } : { active: boolean }) => {
 
   // Life Cycle
   useEffect(() => {
-    console.log('recordState', recordState);
     toggleRecorder[recordState]();
   }, [ recordState ]);
 
@@ -76,14 +78,19 @@ export default ({ active } : { active: boolean }) => {
       </ul>
 
       {alerts.map((alert, idx) => (
-        <Alert
+        <Snackbar
           key={idx}
-          variant="outlined"
-          severity="error"
-          style={{ width: '50%', position: 'absolute', right: 0, bottom: `calc(50px * ${idx + 1})` }}
+          open
+          autoHideDuration={6000}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          style={{ bottom: `calc(50px * ${idx + 1})` }}
           onClose={() => { setAlert((prev) => prev.filter((_, i) => i !== idx)); }}>
-          {alert}
-        </Alert>
+          <Alert
+            severity="error"
+            onClose={() => { setAlert((prev) => prev.filter((_, i) => i !== idx)); }}>
+            {alert}
+          </Alert>
+        </Snackbar>
       ))}
 
       {/* Footer */}
