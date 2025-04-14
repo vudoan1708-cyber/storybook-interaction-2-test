@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { AddonPanel } from '@storybook/components';
 
@@ -20,6 +20,8 @@ export default ({ active } : { active: boolean }) => {
   const [ recordState, setRecordState ] = useState<Status>('off');
   const [ alerts, setAlert ] = useState<string[]>([]);
 
+  const rootRef = useRef<HTMLElement | null>(null);
+
   const recordChangesToDomTree = (status: Status) => {
     console.log(`${status === 'on' ? 'Recording....' : 'Stopping....'}`);
     new MutationObserver(() => {
@@ -29,7 +31,7 @@ export default ({ active } : { active: boolean }) => {
 
   // Wrap the event handler with useCallback so that its reference remains stable.
   const parseElementViaUserEvent = useCallback((e: Event) => {
-    const elementWithDataTestId = onElementClick(e);
+    const elementWithDataTestId = onElementClick(rootRef.current as any, e);
     if (!elementWithDataTestId) {
       setAlert((prev) => [ ...prev, `${(e?.target as any)?.nodeName} doesn't have a data-testid and neither do its parent elements` ]);
       return;
@@ -41,16 +43,17 @@ export default ({ active } : { active: boolean }) => {
   const toggleListener = (status: Status) => {
     // get the iframe content window
     const frameElement = document.querySelector('iframe[data-is-storybook="true"]');
-    const root: HTMLElement = (frameElement as any)?.contentDocument.querySelector('#root');
-    if (!root) return;
+    const rootElement: HTMLElement = (frameElement as any)?.contentDocument.querySelector('#root');
+    // update the ref
+    rootRef.current = rootElement;
+    if (!rootRef.current) return;
   
-    console.log('root', root);
     if (status === 'on') {
-      root.addEventListener('click', parseElementViaUserEvent);
+      rootRef.current.addEventListener('click', parseElementViaUserEvent);
       return;
     }
     if (status === 'off') {
-      root.removeEventListener('click', parseElementViaUserEvent);
+      rootRef.current.removeEventListener('click', parseElementViaUserEvent);
     }
   };
   
