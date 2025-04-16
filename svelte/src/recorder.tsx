@@ -1,5 +1,5 @@
 import { addons, types } from '@storybook/addons';
-import React, { Key, useEffect, useState } from 'react';
+import React, { Key } from 'react';
 
 import InteractionPanel from './panel';
 
