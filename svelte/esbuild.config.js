@@ -17,52 +17,43 @@ const includeFilter = new RegExp(
   `(${includeModules.map(m => m.replace('/', '[\\/\\\\]')).join('|')})`
 );
 
-async function start() {
-  const ctx = await esbuild.context({
+const sharedOptions = {
+  bundle: true,
+  sourcemap: true,
+  logLevel: 'info',
+  loader: {
+    '.ts': 'ts',
+    '.tsx': 'tsx',
+  },
+};
+
+function buildBrowser() {
+  return esbuild.context({
+    ...sharedOptions,
     entryPoints: ['src/recorder.tsx'],
-    outfile: 'dist/recorder.js',
-    bundle: true,
-    platform: 'browser', // ⬅️ Changed from "node" to "browser"
-    target: ['es2017'], // ⬅️ More appropriate for browser/manager UI
-    external: ['react', 'react-dom'], // ⬅️ Essential for React addons!
+    outfile: 'dist/manager.js',
+    platform: 'browser',
+    target: ['es2017'],
+    external: ['react', 'react-dom', '@storybook/addons', '@storybook/components'],
     format: 'cjs',
-    sourcemap: true,
-    logLevel: 'info',
-    loader: {
-      '.ts': 'ts',
-      '.tsx': 'tsx',
-    },
-    plugins: [
-      {
-        name: 'transpile-node-modules',
-        setup(build) {
-          build.onResolve({ filter: /.*/ }, args => {
-            if (
-              args.path.startsWith('.') ||
-              path.isAbsolute(args.path)
-            ) return;
-
-            try {
-              const resolved = require.resolve(args.path, {
-                paths: [args.resolveDir],
-              });
-
-              if (includeFilter.test(resolved)) {
-                return { path: resolved };
-              }
-            } catch (e) {
-              // fallback
-            }
-
-            return { path: args.path, external: true };
-          });
-        },
-      },
-    ],
   });
+}
 
-  await ctx.watch();
-  console.log('👀 Watching for changes...');
+function buildNode() {
+  return esbuild.context({
+    ...sharedOptions,
+    entryPoints: ['src/preset.ts'],
+    outfile: 'dist/preset.js',
+    platform: 'node',
+    target: ['node14'],
+    format: 'cjs',
+  });
+}
+
+async function start() {
+  const [browserCtx, nodeCtx] = await Promise.all([buildBrowser(), buildNode()]);
+  await Promise.all([browserCtx.watch(), nodeCtx.watch()]);
+  console.log('👀 Watching browser + node builds...');
 }
 
 start().catch(err => {
