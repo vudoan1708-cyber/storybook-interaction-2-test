@@ -14,7 +14,7 @@ import {
 
 // Type
 import { Status } from '../types';
-import { onElementClick } from "./eventListeners";
+import { onElementClick } from "./helpers/eventListeners";
 
 export default ({ active } : { active: boolean }) => {
   const [ recordState, setRecordState ] = useState<Status>('off');
@@ -23,7 +23,6 @@ export default ({ active } : { active: boolean }) => {
   const rootRef = useRef<HTMLElement | null>(null);
 
   const recordChangesToDomTree = (status: Status) => {
-    console.log(`${status === 'on' ? 'Recording....' : 'Stopping....'}`);
     new MutationObserver(() => {
   
     });
