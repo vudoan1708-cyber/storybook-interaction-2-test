@@ -30,8 +30,11 @@ const sharedOptions = {
 function buildBrowser() {
   return esbuild.context({
     ...sharedOptions,
-    entryPoints: ['src/recorder.tsx'],
-    outfile: 'dist/manager.js',
+    entryPoints: [
+      'src/manager.tsx',
+      // 'src/preview.ts'
+    ],
+    outdir: 'dist',
     platform: 'browser',
     target: ['es2017'],
     external: ['react', 'react-dom', '@storybook/addons', '@storybook/components'],
@@ -43,7 +46,7 @@ function buildNode() {
   return esbuild.context({
     ...sharedOptions,
     entryPoints: ['src/preset.ts'],
-    outfile: 'dist/preset.js',
+    outdir: 'dist',
     platform: 'node',
     target: ['node14'],
     format: 'cjs',

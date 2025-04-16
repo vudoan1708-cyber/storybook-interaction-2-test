@@ -1,4 +1,4 @@
-import { EventType } from "../types";
+import { EventType } from "../../types";
 
 const __checkIfMany = (root: HTMLElement, target: HTMLElement, attributeValue: string | null) => {
   const elements = root.querySelectorAll(`[data-testid="${attributeValue}"]`);
