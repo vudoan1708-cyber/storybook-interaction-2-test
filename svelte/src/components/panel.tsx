@@ -13,14 +13,17 @@ import {
 } from '@mui/icons-material';
 
 // Type
-import { Status } from '../types';
-import { onElementClick } from "./helpers/eventListeners";
+import { Actors, Status } from '../../types';
+import { onElementClick } from "../helpers/eventListeners";
 
-export default ({ active } : { active: boolean }) => {
+export default ({ active, actors } : { active: boolean, actors: Actors }) => {
+  console.log('✨ panel actors:', actors);
   const [ recordState, setRecordState ] = useState<Status>('off');
   const [ alerts, setAlert ] = useState<string[]>([]);
 
+  // Create ref to use updated variable inside useCallback
   const rootRef = useRef<HTMLElement | null>(null);
+  const actorsRef = useRef<Actors>(actors);
 
   const recordChangesToDomTree = (status: Status) => {
     new MutationObserver(() => {
@@ -30,7 +33,7 @@ export default ({ active } : { active: boolean }) => {
 
   // Wrap the event handler with useCallback so that its reference remains stable.
   const parseElementViaUserEvent = useCallback((e: Event) => {
-    const elementWithDataTestId = onElementClick(rootRef.current as any, e);
+    const elementWithDataTestId = onElementClick(rootRef.current as any, e, actorsRef.current);
     if (!elementWithDataTestId) {
       setAlert((prev) => [ ...prev, `${(e?.target as any)?.nodeName} doesn't have a data-testid and neither do its parent elements` ]);
       return;
@@ -72,6 +75,9 @@ export default ({ active } : { active: boolean }) => {
   useEffect(() => {
     toggleRecorder[recordState]();
   }, [ recordState ]);
+  useEffect(() => {
+    actorsRef.current = actors;
+  }, [ actors ]);
 
   return (
     <AddonPanel active={active}>
