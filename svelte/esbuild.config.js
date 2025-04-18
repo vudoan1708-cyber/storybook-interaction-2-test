@@ -1,4 +1,3 @@
-// esbuild.config.js
 const esbuild = require('esbuild');
 const path = require('path');
 
@@ -37,7 +36,7 @@ function buildBrowser() {
     outdir: 'dist',
     platform: 'browser',
     target: ['es2017'],
-    external: ['react', 'react-dom', '@storybook/addons', '@storybook/components'],
+    external: ['react', 'react-dom', 'svelte', '@storybook/addons', '@storybook/components'],
     format: 'cjs',
   });
 }
@@ -49,6 +48,7 @@ function buildNode() {
     outdir: 'dist',
     platform: 'node',
     target: ['node14'],
+    external: ['svelte'],
     format: 'cjs',
   });
 }

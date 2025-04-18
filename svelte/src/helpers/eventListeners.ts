@@ -1,4 +1,4 @@
-import { EventType } from "../../types";
+import { Actors, EventType } from "../../types";
 
 const __checkIfMany = (root: HTMLElement, target: HTMLElement, attributeValue: string | null) => {
   const elements = root.querySelectorAll(`[data-testid="${attributeValue}"]`);
@@ -17,19 +17,25 @@ const __checkIfMany = (root: HTMLElement, target: HTMLElement, attributeValue: s
   return finalElement;
 };
 
-const __getElementByDataTestId = (root: HTMLElement, target: HTMLElement | null | undefined, eventType: EventType) => {
+const __getElementByDataTestId = (
+  root: HTMLElement,
+  target: HTMLElement | null | undefined,
+  eventType: EventType,
+  actors: Actors
+) => {
   const parentIsRoot = target?.parentElement?.querySelector('#root');
   if (parentIsRoot) {
     console.error('No data-testid found in clicked element and its parent elements');
     return null;
   }
   // if target element has a data-testid attribute and has the same event type
-  if (target?.getAttribute('data-testid')) {
-    return __checkIfMany(root, target, target?.getAttribute('data-testid'));
+  const attributeValue = target?.getAttribute('data-testid');
+  if (attributeValue && actors[attributeValue]) {
+    return __checkIfMany(root, target as HTMLElement, attributeValue);
   }
-  return __getElementByDataTestId(root, target?.parentElement, eventType);
+  return __getElementByDataTestId(root, target?.parentElement, eventType, actors);
 };
 
-export const onElementClick = (root: HTMLElement, e: Event) => {
-  return __getElementByDataTestId(root, e?.target as HTMLElement, 'click');
+export const onElementClick = (root: HTMLElement, e: Event, actors: Actors) => {
+  return __getElementByDataTestId(root, e?.target as HTMLElement, 'click', actors);
 };

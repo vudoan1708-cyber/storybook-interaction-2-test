@@ -23,7 +23,7 @@
   "peerDependencies": {
     "@storybook/addons": "^6.5.16",
     "@storybook/components": "^6.5.16",
-    "svelte": "3.49.0"
+    "svelte": "^3.49.0"
   },
   "dependencies": {
     "@babel/parser": "^7.27.0",
@@ -36,11 +36,13 @@
     "@storybook/components": "^6.5.16",
     "@storybook/core-events": "^8.6.12",
     "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "react-dom": "^18.0.0",
+    "ws": "^8.18.1"
   },
   "devDependencies": {
     "@types/babel__traverse": "^7.20.7",
     "@types/react": "^19.1.1",
+    "@types/ws": "^8.18.1",
     "babel-loader": "^10.0.0",
     "esbuild": "^0.25.2",
     "typescript": "^5.8.3"
