@@ -1,7 +1,9 @@
 import { AlertColor } from '@mui/material';
 
 export type Status = 'on' | 'off';
-export type EventType = 'click' | 'hover' | 'input';
+export type EventType = 'click' | 'hover' | 'input' | 'change';
+
+export type JestQuery = 'queryByTestId' | 'queryAllByTestId';
 
 export type EnrichedStory = {
   id: string;
@@ -25,5 +27,10 @@ export type Actors = {
 export type UserEventResult = {
   status: AlertColor;
   message?: string;
-  element?: Element | null;
+  target?: {
+    eventType: EventType;
+    accessBy: JestQuery;
+    element: Element | null;
+    accessAtIndex: number;
+  };
 };

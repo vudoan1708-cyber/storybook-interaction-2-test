@@ -12,13 +12,16 @@ import {
   Stop as StopIcon,
 } from '@mui/icons-material';
 
+import Panel_list from "./panel_list";
+
 // Type
-import { Actors, EventType, Status } from '../../types';
-import { onElementClick, onElementInput } from "../helpers/eventListeners";
+import { Actors, EventType, Status, UserEventResult } from '../../types';
+import { onElementChange, onElementClick, onElementInput } from "../helpers/eventListeners";
 
 export default ({ active, actors } : { active: boolean, actors: Actors }) => {
   const [ recordState, setRecordState ] = useState<Status>('off');
-  const [ alerts, setAlert ] = useState<{ message: string, style: AlertProps['severity'] }[]>([]);
+  const [ alerts, setAlert ] = useState<Array<{ message: string, style: AlertProps['severity'] }>>([]);
+  const [ steps, setSteps ] = useState<Array<UserEventResult['target']>>([]);
 
   // Create ref to use updated variable inside useCallback
   const rootRef = useRef<HTMLElement | null>(null);
@@ -35,15 +38,19 @@ export default ({ active, actors } : { active: boolean, actors: Actors }) => {
     const elementWithDataTestId = {
       click: () => onElementClick(rootRef.current as any, e, actorsRef.current),
       input: () => onElementInput(rootRef.current as any, e, actorsRef.current),
+      change: () => onElementChange(rootRef.current as any, e, actorsRef.current),
       hover: () => null,
     };
     const result = elementWithDataTestId[e.type as EventType]();
-    // if (result?.status === 'error' || result?.status === 'warn') {
-    setAlert((prev) => [ ...prev, { message: result?.message as string, style: result?.status } ]);
-    return;
-    // }
-
+    if (result?.status === 'error' || result?.status === 'warning') {
+      setAlert((prev) => [ ...prev, { message: result?.message as string, style: result?.status } ]);
+      return;
+    }
     // TODO: collate user flow into coherent dataset for processing
+    if (result?.status === 'success') {
+      // Use User interaction to Jest code mapper here
+      setSteps((items) => [ ...items, result.target ]);
+    }
   }, []);
   
   const toggleListener = (status: Status) => {
@@ -55,13 +62,15 @@ export default ({ active, actors } : { active: boolean, actors: Actors }) => {
     if (!rootRef.current) return;
   
     if (status === 'on') {
-      rootRef.current.addEventListener('click', parseElementViaUserEvent);
+      rootRef.current.addEventListener('click', parseElementViaUserEvent, { capture: true });
       rootRef.current.addEventListener('input', parseElementViaUserEvent);
+      rootRef.current.addEventListener('change', parseElementViaUserEvent, { capture: true });
       return;
     }
     if (status === 'off') {
-      rootRef.current.removeEventListener('click', parseElementViaUserEvent);
+      rootRef.current.removeEventListener('click', parseElementViaUserEvent, { capture: true });
       rootRef.current.removeEventListener('input', parseElementViaUserEvent);
+      rootRef.current.removeEventListener('change', parseElementViaUserEvent, { capture: true });
     }
   };
   
@@ -88,8 +97,7 @@ export default ({ active, actors } : { active: boolean, actors: Actors }) => {
   return (
     <AddonPanel active={active}>
       <h3>Recorded Interactions:</h3>
-      <ul>
-      </ul>
+      <Panel_list list={steps} />
 
       {alerts.map((alert, idx) => (
         <Snackbar

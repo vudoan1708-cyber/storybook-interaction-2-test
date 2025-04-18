@@ -1,20 +1,33 @@
 import { Actors, EventType, UserEventResult } from "../../types";
 
-const __checkIfMany = (root: HTMLElement, target: HTMLElement, attributeValue: string | null) => {
+const __checkIfMany = (
+  root: HTMLElement,
+  target: HTMLElement,
+  attributeValue: string | null
+): Omit<NonNullable<UserEventResult['target']>, 'eventType'> => {
   const elements = root.querySelectorAll(`[data-testid="${attributeValue}"]`);
   if (elements.length === 1) {
-    return elements[0];
+    return {
+      accessBy: 'queryByTestId',
+      element: elements[0],
+      accessAtIndex: 0,
+    };
   }
 
   let finalElement: HTMLElement | null = null;
+  let idx = 0;
   for (const element of elements) {
     if (target === element) {
       finalElement = element as HTMLElement;
       break;
     }
+    idx++;
   }
-  console.log('finalElement', finalElement);
-  return finalElement;
+  return {
+    accessBy: 'queryAllByTestId',
+    element: finalElement,
+    accessAtIndex: idx,
+  };
 };
 
 const __getElementByDataTestId = (
@@ -34,10 +47,21 @@ const __getElementByDataTestId = (
   const attributeValue = target?.getAttribute('data-testid');
   if (attributeValue) {
     if (actors[attributeValue] === eventType) {
+      const found = __checkIfMany(root, target as HTMLElement, attributeValue);
+      console.log({ ...found, eventType });
+      const returnObj = {
+        success: {
+          status: 'success',
+          message: `Step recorded with ${eventType} event on ${(target as any)?.nodeName} element`,
+        } as UserEventResult,
+        error: {
+          status: 'error',
+          message: 'Internal error: Element not found',
+        } as UserEventResult,
+      };
       return {
-        status: 'success',
-        element: __checkIfMany(root, target as HTMLElement, attributeValue),
-        message: `Step recorded with ${eventType} event on ${(target as any)?.nodeName}`,
+        ...returnObj[found.element ? 'success' : 'error'],
+        target: { ...found, eventType },
       };
     }
     return {
@@ -53,4 +77,7 @@ export const onElementClick = (root: HTMLElement, e: Event, actors: Actors): Use
 };
 export const onElementInput = (root: HTMLElement, e: Event, actors: Actors): UserEventResult => {
   return __getElementByDataTestId(root, e?.target as HTMLElement, 'input', actors);
+};
+export const onElementChange = (root: HTMLElement, e: Event, actors: Actors): UserEventResult => {
+  return __getElementByDataTestId(root, e?.target as HTMLElement, 'change', actors);
 };
