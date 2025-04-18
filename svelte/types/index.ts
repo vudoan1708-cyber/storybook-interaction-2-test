@@ -1,3 +1,5 @@
+import { AlertColor } from '@mui/material';
+
 export type Status = 'on' | 'off';
 export type EventType = 'click' | 'hover' | 'input';
 
@@ -18,4 +20,10 @@ export type UserEvent = {
 
 export type Actors = {
   [x: string]: EventType;
+};
+
+export type UserEventResult = {
+  status: AlertColor;
+  message?: string;
+  element?: Element | null;
 };

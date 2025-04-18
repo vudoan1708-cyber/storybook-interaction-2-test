@@ -4,7 +4,7 @@ import { AddonPanel } from '@storybook/components';
 
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
-import Alert from '@mui/material/Alert';
+import Alert, { AlertProps } from '@mui/material/Alert';
 import Snackbar from "@mui/material/Snackbar";
 
 import {
@@ -13,13 +13,12 @@ import {
 } from '@mui/icons-material';
 
 // Type
-import { Actors, Status } from '../../types';
-import { onElementClick } from "../helpers/eventListeners";
+import { Actors, EventType, Status } from '../../types';
+import { onElementClick, onElementInput } from "../helpers/eventListeners";
 
 export default ({ active, actors } : { active: boolean, actors: Actors }) => {
-  console.log('✨ panel actors:', actors);
   const [ recordState, setRecordState ] = useState<Status>('off');
-  const [ alerts, setAlert ] = useState<string[]>([]);
+  const [ alerts, setAlert ] = useState<{ message: string, style: AlertProps['severity'] }[]>([]);
 
   // Create ref to use updated variable inside useCallback
   const rootRef = useRef<HTMLElement | null>(null);
@@ -33,11 +32,16 @@ export default ({ active, actors } : { active: boolean, actors: Actors }) => {
 
   // Wrap the event handler with useCallback so that its reference remains stable.
   const parseElementViaUserEvent = useCallback((e: Event) => {
-    const elementWithDataTestId = onElementClick(rootRef.current as any, e, actorsRef.current);
-    if (!elementWithDataTestId) {
-      setAlert((prev) => [ ...prev, `${(e?.target as any)?.nodeName} doesn't have a data-testid and neither do its parent elements` ]);
-      return;
-    }
+    const elementWithDataTestId = {
+      click: () => onElementClick(rootRef.current as any, e, actorsRef.current),
+      input: () => onElementInput(rootRef.current as any, e, actorsRef.current),
+      hover: () => null,
+    };
+    const result = elementWithDataTestId[e.type as EventType]();
+    // if (result?.status === 'error' || result?.status === 'warn') {
+    setAlert((prev) => [ ...prev, { message: result?.message as string, style: result?.status } ]);
+    return;
+    // }
 
     // TODO: collate user flow into coherent dataset for processing
   }, []);
@@ -52,10 +56,12 @@ export default ({ active, actors } : { active: boolean, actors: Actors }) => {
   
     if (status === 'on') {
       rootRef.current.addEventListener('click', parseElementViaUserEvent);
+      rootRef.current.addEventListener('input', parseElementViaUserEvent);
       return;
     }
     if (status === 'off') {
       rootRef.current.removeEventListener('click', parseElementViaUserEvent);
+      rootRef.current.removeEventListener('input', parseElementViaUserEvent);
     }
   };
   
@@ -94,9 +100,9 @@ export default ({ active, actors } : { active: boolean, actors: Actors }) => {
           style={{ bottom: `calc(50px * ${idx + 1})` }}
           onClose={() => { setAlert((prev) => prev.filter((_, i) => i !== idx)); }}>
           <Alert
-            severity="error"
+            severity={alert.style}
             onClose={() => { setAlert((prev) => prev.filter((_, i) => i !== idx)); }}>
-            {alert}
+            {alert.message}
           </Alert>
         </Snackbar>
       ))}
