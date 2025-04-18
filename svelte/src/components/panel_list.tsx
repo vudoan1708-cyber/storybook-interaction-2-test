@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { UserEventResult } from '../../types';
+import React from 'react';
+import { JestExpressionStatement } from '../../types';
 
-export default ({ list }: { list: Array<UserEventResult['target']> }) => {
+import Code from './code';
+
+export default ({ list }: { list: Array<JestExpressionStatement> }) => {
   return (
-    <ul>
+    <ol>
       {list?.map((item, idx) => (
-        <li key={idx}>{item?.element?.tagName} {item?.eventType}</li>
+        <li key={idx}><Code item={item} /></li>
       ))}
-    </ul>
+    </ol>
   )
 }
