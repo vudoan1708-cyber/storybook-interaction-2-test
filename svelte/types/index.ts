@@ -30,7 +30,31 @@ export type UserEventResult = {
   target?: {
     eventType: EventType;
     accessBy: JestQuery;
-    element: Element | null;
+    element: HTMLElement | Element | null;
     accessAtIndex: number;
   };
+};
+
+export type JavascriptUntouchedKeyword = 'await' | 'function' | 'new' | 'break' | 'continue' | 'const' | 'let';
+export type FunctionExpression = {
+  type: 'arrow_function';
+  params: Array<any>;
+  block: JestExpressionStatement;
+};
+export type ObjectExpression = {
+  type: 'object';
+  properties: {
+    key: string;
+    value: Argument;
+  };
+};
+export type Argument = HTMLElement | Element | string | number | ObjectExpression | FunctionExpression;
+export type JestMemberExpression = {
+  object: string;
+  property: string;
+  arguments?: Array<Argument>;
+};
+export type JestExpressionStatement = {
+  keyword?: JavascriptUntouchedKeyword;
+  callee: JestMemberExpression;
 };

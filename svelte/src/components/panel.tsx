@@ -12,16 +12,17 @@ import {
   Stop as StopIcon,
 } from '@mui/icons-material';
 
-import Panel_list from "./panel_list";
+import PanelList from "./panel_list";
 
 // Type
-import { Actors, EventType, Status, UserEventResult } from '../../types';
+import { Actors, EventType, JestExpressionStatement, Status } from '../../types';
 import { onElementChange, onElementClick, onElementInput } from "../helpers/eventListeners";
+import { Jest } from "../helpers/jestAstMapper";
 
 export default ({ active, actors } : { active: boolean, actors: Actors }) => {
   const [ recordState, setRecordState ] = useState<Status>('off');
   const [ alerts, setAlert ] = useState<Array<{ message: string, style: AlertProps['severity'] }>>([]);
-  const [ steps, setSteps ] = useState<Array<UserEventResult['target']>>([]);
+  const [ steps, setSteps ] = useState<Array<JestExpressionStatement>>([]);
 
   // Create ref to use updated variable inside useCallback
   const rootRef = useRef<HTMLElement | null>(null);
@@ -49,7 +50,8 @@ export default ({ active, actors } : { active: boolean, actors: Actors }) => {
     // TODO: collate user flow into coherent dataset for processing
     if (result?.status === 'success') {
       // Use User interaction to Jest code mapper here
-      setSteps((items) => [ ...items, result.target ]);
+      const recordedStep = Jest[result.target?.eventType as EventType](result.target, (result.target?.element as HTMLInputElement)?.value ?? '');
+      setSteps((items) => [ ...items, recordedStep ]);
     }
   }, []);
   
@@ -97,7 +99,7 @@ export default ({ active, actors } : { active: boolean, actors: Actors }) => {
   return (
     <AddonPanel active={active}>
       <h3>Recorded Interactions:</h3>
-      <Panel_list list={steps} />
+      <PanelList list={steps} />
 
       {alerts.map((alert, idx) => (
         <Snackbar
