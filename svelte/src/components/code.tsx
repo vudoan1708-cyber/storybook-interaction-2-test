@@ -10,7 +10,7 @@ const ObjectCode = styled.span`
   color: #8cefd8;
 `;
 const PropertyCode = styled.span`
-color: #8cefd8;
+  color: #8cefd8;
 `;
 const ArgumentCode = styled.span`
   color: #f0bbf5;

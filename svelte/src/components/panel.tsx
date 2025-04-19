@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { AddonPanel } from '@storybook/components';
 
@@ -10,16 +10,29 @@ import Snackbar from "@mui/material/Snackbar";
 import {
   RadioButtonChecked as RadioButtonCheckedIcon,
   Stop as StopIcon,
+  FeaturedPlayList as FeaturedPlayListIcon,
 } from '@mui/icons-material';
 
-import PanelList from "./panel_list";
+import styled from '@emotion/styled';
+
+import PanelList from './panel_list';
 
 // Type
 import { Actors, EventType, JestExpressionStatement, Status } from '../../types';
-import { onElementChange, onElementClick, onElementInput } from "../helpers/eventListeners";
-import { Jest } from "../helpers/jestAstMapper";
+import {
+  onElementChange,
+  onElementClick,
+  onElementInput,
+  Jest,
+} from '../helpers';
 
 const noActorsFoundErrorMessage = '[interaction-2-test] Could not find an actor. Please make sure you define at least 1 actor through i2t-actors property in your stories file';
+
+const H3Style = styled.h3`
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+`;
 
 export default ({ active, actors, storyRendered } : { active: boolean, actors: Actors, storyRendered: boolean }) => {
   const [ recordState, setRecordState ] = useState<Status>('off');
@@ -49,7 +62,6 @@ export default ({ active, actors, storyRendered } : { active: boolean, actors: A
       setAlert((prev) => [ ...prev, { message: result?.message as string, style: result?.status } ]);
       return;
     }
-    // TODO: collate user flow into coherent dataset for processing
     if (result?.status === 'success') {
       // Use User interaction to Jest code mapper here
       const recordedStep = Jest[result.target?.eventType as EventType](result.target, (result.target?.element as HTMLInputElement)?.value ?? '');
@@ -100,6 +112,10 @@ export default ({ active, actors, storyRendered } : { active: boolean, actors: A
     }
   }
 
+  const onItemRemove = (removingIdx: number) => {
+    setSteps((steps) => steps.filter((_, idx) => idx !== removingIdx));
+  };
+
   // Life Cycle
   useEffect(() => {
     toggleRecorder[recordState]();
@@ -117,13 +133,17 @@ export default ({ active, actors, storyRendered } : { active: boolean, actors: A
     // If story is not rendered
     if (!storyRendered) {
       setRecordState('off');
+      setSteps([]);
     }
   }, [ actors, storyRendered ]);
 
   return (
     <AddonPanel active={active}>
-      <h3>Recorded Interactions:</h3>
-      <PanelList list={steps} />
+      <H3Style id="i2t-header" style={{ padding: '8px 0 0 8px' }}>
+        <FeaturedPlayListIcon />
+        Recorded Interactions:
+      </H3Style>
+      <PanelList list={steps} onItemRemove={onItemRemove} />
 
       {alerts.map((alert, idx) => (
         <Snackbar

@@ -32,5 +32,8 @@ What we can do is define our own “actors and scenes” from Storybook paramete
 - Created the list-based UI for the recorded steps based on JST created from user interactions.
 ## [19/04/2025]
 - Alert error and prevent recording when i2t-actors property is not defined / found in Meta component.
-- Turn off an ongoing recording session when current story is changed.
+- When current story is changed:
+  - Turn off an ongoing recording session.
+  - Clear out current recorded steps (if any).
+- Dynamic height for the recorded step list when they expand the maximum height of its container element.
 <br />

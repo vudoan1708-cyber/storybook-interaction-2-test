@@ -48,7 +48,6 @@ const __getElementByDataTestId = (
   if (attributeValue) {
     if (actors[attributeValue] === eventType) {
       const found = __checkIfMany(root, target as HTMLElement, attributeValue);
-      console.log({ ...found, eventType });
       const returnObj = {
         success: {
           status: 'success',

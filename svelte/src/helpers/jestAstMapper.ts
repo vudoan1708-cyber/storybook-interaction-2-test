@@ -40,7 +40,7 @@ export class Jest {
             userEvent?.accessAtIndex ?? 0,
             userEvent?.element?.getAttribute('data-testid'),
           ),
-          value,
+          `"${value}"`,
         ],
       },
     };
@@ -65,7 +65,7 @@ export class Jest {
                 type: 'object',
                 properties: {
                   key: 'value',
-                  value: value,
+                  value: `"${value}"`,
                 },
               },
             },
