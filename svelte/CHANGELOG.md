@@ -36,4 +36,5 @@ What we can do is define our own “actors and scenes” from Storybook paramete
   - Turn off an ongoing recording session.
   - Clear out current recorded steps (if any).
 - Dynamic height for the recorded step list when they expand the maximum height of its container element.
+- Debounce input event handler for 500ms whilst keeping other event handlers in tact.
 <br />

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { AddonPanel } from '@storybook/components';
 
@@ -18,12 +18,13 @@ import styled from '@emotion/styled';
 import PanelList from './panel_list';
 
 // Type
-import { Actors, EventType, JestExpressionStatement, Status } from '../../types';
+import { Actors, EventType, JestExpressionStatement, Status, UserEventResult } from '../../types';
 import {
   onElementChange,
   onElementClick,
   onElementInput,
   Jest,
+  debounce,
 } from '../helpers';
 
 const noActorsFoundErrorMessage = '[interaction-2-test] Could not find an actor. Please make sure you define at least 1 actor through i2t-actors property in your stories file';
@@ -49,15 +50,8 @@ export default ({ active, actors, storyRendered } : { active: boolean, actors: A
     });
   };
 
-  // Wrap the event handler with useCallback so that its reference remains stable.
-  const parseElementViaUserEvent = useCallback((e: Event) => {
-    const elementWithDataTestId = {
-      click: () => onElementClick(rootRef.current as any, e, actorsRef.current),
-      input: () => onElementInput(rootRef.current as any, e, actorsRef.current),
-      change: () => onElementChange(rootRef.current as any, e, actorsRef.current),
-      hover: () => null,
-    };
-    const result = elementWithDataTestId[e.type as EventType]();
+  // Process the result (alert if error or warn and set recorded step list if successful)
+  const processResult = (result: UserEventResult | null) => {
     if (result?.status === 'error' || result?.status === 'warning') {
       setAlert((prev) => [ ...prev, { message: result?.message as string, style: result?.status } ]);
       return;
@@ -67,6 +61,25 @@ export default ({ active, actors, storyRendered } : { active: boolean, actors: A
       const recordedStep = Jest[result.target?.eventType as EventType](result.target, (result.target?.element as HTMLInputElement)?.value ?? '');
       setSteps((items) => [ ...items, recordedStep ]);
     }
+  };
+
+  // Input change event with debounce
+  const onElementInputWithDebounce = useMemo(() => debounce((e: Event) => {
+    const result = onElementInput(rootRef.current as any, e, actorsRef.current);
+    processResult(result);
+    return result;
+  }, 500), [rootRef, actorsRef]);
+
+  // Wrap the event handler with useCallback so that its reference remains stable.
+  const parseElementViaUserEvent = useCallback((e: Event) => {
+    const elementWithDataTestId = {
+      click: () => onElementClick(rootRef.current as any, e, actorsRef.current),
+      input: () => onElementInputWithDebounce(e),
+      change: () => onElementChange(rootRef.current as any, e, actorsRef.current),
+      hover: () => null,
+    };
+    const result = elementWithDataTestId[e.type as EventType]();
+    processResult(result);
   }, []);
   
   const toggleListener = (status: Status) => {
