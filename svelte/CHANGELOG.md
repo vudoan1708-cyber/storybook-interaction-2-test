@@ -30,4 +30,7 @@ What we can do is define our own “actors and scenes” from Storybook paramete
 ## [18/04/2025]
 - Learned a bit about `Abstract Syntax Tree` (AST) and decided to create my own quick mini version of `Jest syntax tree` (JST).
 - Created the list-based UI for the recorded steps based on JST created from user interactions.
+## [19/04/2025]
+- Alert error and prevent recording when i2t-actors property is not defined / found in Meta component.
+- Turn off an ongoing recording session when current story is changed.
 <br />

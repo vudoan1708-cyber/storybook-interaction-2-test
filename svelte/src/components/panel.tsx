@@ -19,7 +19,9 @@ import { Actors, EventType, JestExpressionStatement, Status } from '../../types'
 import { onElementChange, onElementClick, onElementInput } from "../helpers/eventListeners";
 import { Jest } from "../helpers/jestAstMapper";
 
-export default ({ active, actors } : { active: boolean, actors: Actors }) => {
+const noActorsFoundErrorMessage = '[interaction-2-test] Could not find an actor. Please make sure you define at least 1 actor through i2t-actors property in your stories file';
+
+export default ({ active, actors, storyRendered } : { active: boolean, actors: Actors, storyRendered: boolean }) => {
   const [ recordState, setRecordState ] = useState<Status>('off');
   const [ alerts, setAlert ] = useState<Array<{ message: string, style: AlertProps['severity'] }>>([]);
   const [ steps, setSteps ] = useState<Array<JestExpressionStatement>>([]);
@@ -62,6 +64,16 @@ export default ({ active, actors } : { active: boolean, actors: Actors }) => {
     // update the ref
     rootRef.current = rootElement;
     if (!rootRef.current) return;
+    if (!actorsRef.current) {
+      setAlert([
+        {
+          message: noActorsFoundErrorMessage,
+          style: 'error',
+        }
+      ]);
+      setRecordState('off');
+      return;
+    }
   
     if (status === 'on') {
       rootRef.current.addEventListener('click', parseElementViaUserEvent, { capture: true });
@@ -94,7 +106,19 @@ export default ({ active, actors } : { active: boolean, actors: Actors }) => {
   }, [ recordState ]);
   useEffect(() => {
     actorsRef.current = actors;
-  }, [ actors ]);
+    if (!actorsRef.current && storyRendered) {
+      setAlert([
+        {
+          message: noActorsFoundErrorMessage,
+          style: 'error',
+        }
+      ]);
+    }
+    // If story is not rendered
+    if (!storyRendered) {
+      setRecordState('off');
+    }
+  }, [ actors, storyRendered ]);
 
   return (
     <AddonPanel active={active}>
