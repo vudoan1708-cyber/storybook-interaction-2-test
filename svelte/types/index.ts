@@ -2,6 +2,7 @@ import { AlertColor } from '@mui/material';
 
 export type Status = 'on' | 'off';
 export type EventType = 'click' | 'hover' | 'input' | 'change';
+export type Framework = 'svelte' | 'react' | 'angular';
 
 export type JestQuery = 'queryByTestId' | 'queryAllByTestId';
 

@@ -15,4 +15,7 @@ Add this to the `main.js` addons array and it should work straight away.
 
 ## Release Notes
 
+## References
+[Svelte Logo](https://en.m.wikipedia.org/wiki/File:Svelte_Logo.svg)
+
 ### 1.0.0

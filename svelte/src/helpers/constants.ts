@@ -6,3 +6,9 @@ export const STORIES_LOADED_EVENT_NAME = `${ADDON_ID}/stories-loaded`;
 export const WS_PORT = 42999;
 
 export const DEFINE_ACTORS = 'i2t-actors';
+
+export const FRAMEWORK_TO_LOGO = {
+  svelte: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/Svelte_Logo.svg',
+  react: '',
+  angular: '',
+};
