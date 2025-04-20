@@ -21,7 +21,18 @@ import styled from '@emotion/styled';
 import PanelList from './panel_list';
 
 // Type
-import { Actors, EventType, Framework, JestExpressionStatement, Status, UserEventResult } from '../../types';
+import {
+  Actors,
+  Argument,
+  EventType,
+  Framework,
+  JestDeclarationExpression,
+  JestExpressionStatement,
+  JestQuery,
+  ObjectExpression,
+  Status,
+  UserEventResult,
+} from '../../types';
 import {
   onElementChange,
   onElementClick,
@@ -70,20 +81,32 @@ export default ({
   actors,
   storyRendered,
   framework,
+  component,
 } : {
   active: boolean,
   actors: Actors,
   storyRendered: boolean,
   framework: Framework,
+  component: {
+    componentName: string,
+    extension: string,
+    props: ObjectExpression['properties'],
+  }
 }) => {
   const [ recordState, setRecordState ] = useState<Status>('off');
   const [ alerts, setAlert ] = useState<Array<{ message: string, style: AlertProps['severity'] }>>([]);
   const [ steps, setSteps ] = useState<Array<JestExpressionStatement>>([]);
+  const [ imports, setImports ] = useState<JestDeclarationExpression['importDeclaration']>([]);
+  const [ variables, setVariables ] = useState<JestDeclarationExpression['variableDeclaration']>([]);
   const [ testFramework, setTestFramework ] = useState('Jest');
 
   // Create ref to use updated variable inside useCallback
   const rootRef = useRef<HTMLElement | null>(null);
   const actorsRef = useRef<Actors>(actors);
+  const componentRef = useRef(component);
+
+  // Initialise Jest with a FE framework
+  Jest.init(framework, component.componentName);
 
   const recordChangesToDomTree = (status: Status) => {
     new MutationObserver(() => {
@@ -101,6 +124,10 @@ export default ({
       // Use User interaction to Jest code mapper here
       const recordedStep = Jest[result.target?.eventType as EventType](result.target, (result.target?.element as HTMLInputElement)?.value ?? '');
       setSteps((items) => [ ...items, recordedStep ]);
+      // Check for imports or declaration
+      const declarationStatements = Jest.createDeclaration(result.target?.accessBy as JestQuery, componentRef.current.props);
+      setImports(declarationStatements?.importDeclaration ?? []);
+      setVariables(declarationStatements?.variableDeclaration ?? []);
     }
   };
 
@@ -190,6 +217,9 @@ export default ({
       setSteps([]);
     }
   }, [ actors, storyRendered ]);
+  useEffect(() => {
+    componentRef.current = component;
+  }, [ component ]);
 
   return (
     <AddonPanel active={active}>
@@ -197,7 +227,11 @@ export default ({
         <FeaturedPlayListIcon />
         Recorded Interactions
       </H3Style>
-      <PanelList list={steps} onItemRemove={onItemRemove} />
+      <PanelList
+        actionList={steps}
+        importList={imports}
+        variableList={variables}
+        onItemRemove={onItemRemove} />
 
       {alerts.map((alert, idx) => (
         <Snackbar
@@ -223,8 +257,7 @@ export default ({
             style={recordState === 'off' ? { backgroundColor: 'rgba(225, 225, 225, 0.08)', width: '100px' } : { width: '100px' }}
             color="error"
             startIcon={recordState === 'off' ? <RadioButtonCheckedIcon color="error" /> : <StopIcon />}
-            onClick={(e) => {
-              e.persist();
+            onClick={() => {
               setRecordState((prev) => prev === 'off' ? 'on' : 'off');
             }}>
             {recordState === 'off' ? 'Record' : 'Stop'}

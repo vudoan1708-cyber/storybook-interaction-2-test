@@ -1,5 +1,14 @@
 import React from 'react';
-import { Argument, JestExpressionStatement, ObjectExpression } from '../../types';
+import {
+  Argument,
+  ImportExportKind,
+  JestExpressionStatement,
+  JestImportPath,
+  JestLifeCycleFunction,
+  JestMemberExpression,
+  JestQuery,
+  ObjectExpression,
+} from '../../types';
 
 import styled from '@emotion/styled';
 
@@ -18,20 +27,43 @@ const ArgumentCode = styled.span`
 const ParenthesisStyle = styled.span`
   color: #da70d6;
 `;
+const LiteralStyle = styled.span`
+  color: #f9dea6;
+`;
 const CodeStyle = styled.code`
   background-color: rgb(50, 50, 50);
   padding: 4px;
   border-radius: 4px;
 `;
 
-export default ({ item }: { item: JestExpressionStatement }) => {
+type ImportDeclarationStatement = {
+  declarationSyntax: ImportExportKind;
+  keywords: Set<Omit<JestLifeCycleFunction, JestQuery>>;
+  source: JestImportPath;
+};
+type VariableDeclarationStatement = {
+  declarationSyntax: ImportExportKind;
+  keywords: Set<JestQuery>;
+  callee: JestMemberExpression<'declaration'>;
+};
+export default ({
+  item,
+  kind,
+}: {
+  item: JestExpressionStatement | ImportDeclarationStatement | VariableDeclarationStatement,
+  kind: 'importDeclarations' | 'variableDeclarations' | 'statements',
+}) => {
   const isObjectExpression = (arg: Argument): arg is ObjectExpression => {
     return typeof arg === 'object' && arg !== null && 'type' in arg && (arg as any).type === 'object';
   };
   const generateArguments = (arg: Argument): string => {
     if (isObjectExpression(arg)) {
       return `{
-        ${arg.properties.key}: ${generateArguments(arg.properties.value)}
+        ${
+          Array.isArray(arg.properties)
+            ? (arg.properties as Array<{ key: string; value: Argument }>).map((prop) => `${prop.key}: ${generateArguments(prop.value)}`).join(', ')
+            : (arg.properties as { key: string; value: Argument }).key}: ${generateArguments((arg.properties as { key: string; value: Argument }).value)
+          }
       }`;
     }
     if (typeof arg === 'string') {
@@ -39,19 +71,57 @@ export default ({ item }: { item: JestExpressionStatement }) => {
     }
     return '';
   }
+  const generateDeclarationProperty = (item: ImportDeclarationStatement) => {
+    if (item.declarationSyntax === 'default') {
+      return `${Array.from(item.keywords.values()).join(', ')}`;
+    }
+    if (item.declarationSyntax === 'named') {
+      return `{ ${Array.from(item.keywords.values()).join(', ')} }`;
+    }
+    return '';
+  };
   return (
     <CodeStyle>
-      {item.keyword ? <KeywordCode>{item.keyword} </KeywordCode> : null}
-      <ObjectCode>{item.callee.object}</ObjectCode><span style={{color: "white"}}>.</span><PropertyCode>{item.callee.property}</PropertyCode>
-      <ParenthesisStyle>
-        (
-          <ArgumentCode>
-            {item.callee.arguments
-              ?.map((arg) => generateArguments(arg))
-              .join(', ')}
-          </ArgumentCode>
-        )
-      </ParenthesisStyle>
+      {
+        kind === 'statements'
+          ? <>
+              {(item as JestExpressionStatement).keyword ? <KeywordCode>{(item as JestExpressionStatement).keyword} </KeywordCode> : null}
+              <ObjectCode>{(item as JestExpressionStatement).callee.object}</ObjectCode><span style={{color: "white"}}>.</span><PropertyCode>{(item as JestExpressionStatement).callee.property}</PropertyCode>
+              <ParenthesisStyle>
+                (
+                  <ArgumentCode>
+                    {(item as JestExpressionStatement).callee.arguments
+                      ?.map((arg) => generateArguments(arg))
+                      .join(', ')}
+                  </ArgumentCode>
+                )
+              </ParenthesisStyle>
+            </>
+          : <>
+              <KeywordCode>{kind === 'importDeclarations' ? 'import ' : 'const '}</KeywordCode>
+              <ObjectCode>{generateDeclarationProperty(item as ImportDeclarationStatement)} </ObjectCode>
+              <KeywordCode>{kind === 'importDeclarations' ? 'from ' : '= '}</KeywordCode>
+              {
+                kind === 'importDeclarations'
+                  ? <LiteralStyle>
+                      '{(item as ImportDeclarationStatement).source}'
+                    </LiteralStyle>
+                  : <>
+                      <ObjectCode>{(item as VariableDeclarationStatement).callee.object}</ObjectCode>
+                      <ParenthesisStyle>
+                        (
+                          <ArgumentCode>
+                            {(item as VariableDeclarationStatement).callee.arguments
+                              ?.map((arg) => generateArguments(arg))
+                              .join(', ')}
+                          </ArgumentCode>
+                        )
+                      </ParenthesisStyle>
+                    </>
+                  
+              }
+            </>
+      }
     </CodeStyle>
   )
 };

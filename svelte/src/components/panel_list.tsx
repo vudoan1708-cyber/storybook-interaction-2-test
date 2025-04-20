@@ -1,14 +1,26 @@
 import React, { useEffect, useRef } from 'react';
-import { JestExpressionStatement } from '../../types';
 
-import Code from './code';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Tooltip from '@mui/material/Tooltip';
 
 import styled from '@emotion/styled';
 
-export default ({ list, onItemRemove }: { list: Array<JestExpressionStatement>, onItemRemove: (idx: number) => void }) => {
+import Code from './code';
+
+import { JestDeclarationExpression, JestExpressionStatement } from '../../types';
+
+export default ({
+  actionList,
+  onItemRemove,
+  importList,
+  variableList,
+}: {
+  actionList: Array<JestExpressionStatement>,
+  onItemRemove: (idx: number) => void,
+  importList: JestDeclarationExpression['importDeclaration'],
+  variableList: JestDeclarationExpression['variableDeclaration'],
+}) => {
   const footerRef = useRef<HTMLElement | null>(null);
   const headerRef = useRef<HTMLElement | null>(null);
 
@@ -24,23 +36,43 @@ export default ({ list, onItemRemove }: { list: Array<JestExpressionStatement>, 
   }, []);
 
   return (
-    <>
-      {list.length > 0
+    <OlStyle footerHeight={footerRef.current?.offsetHeight ?? 0} headerHeight={headerRef.current?.offsetHeight ?? 0}>
+      {importList.length > 0
         ? (
-          <OlStyle footerHeight={footerRef.current?.offsetHeight ?? 0} headerHeight={headerRef.current?.offsetHeight ?? 0}>
-            {list?.map((item, idx) => (
+            importList?.map((item, idx) => (
               <li key={idx}>
-                <Code item={item} />
-                <Tooltip title="Remove" arrow>
-                  <IconButton aria-label="delete" onClick={() => { onItemRemove(idx); }}>
-                    <DeleteIcon />
-                  </IconButton>
-                </Tooltip>
+                <Code item={item} kind="importDeclarations" />
               </li>
-            ))}
-          </OlStyle>
+            ))
           )
-        : <h3 style={{ textAlign: 'center', color: 'rgb(100, 100, 100)' }}>No user interactions found.</h3>}
-    </>
+        : null
+      }
+      {variableList.length > 0
+        ? (
+          variableList?.map((item, idx) => (
+              <li key={idx}>
+                <Code item={item} kind="variableDeclarations" />
+              </li>
+            ))
+          )
+        : null
+      }
+      {
+        actionList.length > 0
+          ? (
+              actionList?.map((item, idx) => (
+                <li key={idx}>
+                  <Code item={item} kind="statements" />
+                  <Tooltip title="Remove" arrow>
+                    <IconButton aria-label="delete" onClick={() => { onItemRemove(idx); }}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
+                </li>
+              ))
+            )
+          : <h3 style={{ textAlign: 'center', color: 'rgb(100, 100, 100)' }}>No user interactions found.</h3>
+      }
+    </OlStyle>
   )
 }

@@ -1,9 +1,35 @@
 /* This needs to be a class so we could use a factory to determine test technology (Jest, Enzyme, Mocha,...) based on instantiation */
-import { Argument, JestExpressionStatement, JestQuery, UserEventResult } from "../../types";
+import DeclarationMapper from './declarationAstMapper';
+import {
+  Argument,
+  Framework,
+  JestExpressionStatement,
+  JestQuery,
+  ObjectExpression,
+  UserEventResult,
+} from "../../types";
 
-export class Jest {
+export default class Jest {
+  private static __testedComponentName: string;
+
   constructor() {}
-  private static __createArgs(accessBy: JestQuery, accessAtIndex: number, testId?: string | null): Argument {
+
+  private static __createTestFor(framework: Framework) {
+    DeclarationMapper.init(framework);
+  }
+  private static __identifyTestedComponent(componentName: string) {
+    this.__testedComponentName = componentName;
+  }
+  public static init(framework: Framework, componentName: string) {
+    Jest.__createTestFor(framework);
+    Jest.__identifyTestedComponent(componentName);
+  }
+
+  private static __createArgs(
+    accessBy: JestQuery,
+    accessAtIndex: number,
+    testId?: string | null,
+  ): Argument {
     if (accessBy === 'queryByTestId') {
       return `${accessBy}("${testId}")`;
     }
@@ -12,7 +38,7 @@ export class Jest {
     }
     return '';
   }
-  static click(userEvent: UserEventResult['target']): JestExpressionStatement {
+  public static click(userEvent: UserEventResult['target']): JestExpressionStatement {
     return {
       keyword: 'await',
       callee: {
@@ -28,7 +54,7 @@ export class Jest {
       },
     };
   };
-  static input(userEvent: UserEventResult['target'], value: string): JestExpressionStatement {
+  public static input(userEvent: UserEventResult['target'], value: string): JestExpressionStatement {
     return {
       keyword: 'await',
       callee: {
@@ -45,7 +71,7 @@ export class Jest {
       },
     };
   };
-  static change(userEvent: UserEventResult['target'], value: string): JestExpressionStatement {
+  public static change(userEvent: UserEventResult['target'], value: string): JestExpressionStatement {
     return {
       keyword: 'await',
       callee: {
@@ -74,8 +100,7 @@ export class Jest {
       },
     };
   };
-
-  static hover(userEvent: UserEventResult['target']): JestExpressionStatement {
+  public static hover(userEvent: UserEventResult['target']): JestExpressionStatement {
     return {
       keyword: 'await',
       callee: {
@@ -90,5 +115,11 @@ export class Jest {
         ],
       },
     };
+  }
+
+  public static createDeclaration(accessBy: JestQuery, args: ObjectExpression['properties']) {
+    return DeclarationMapper
+      .includeNewDeclaration(accessBy, this.__testedComponentName, args)
+      ?.getAllDeclarations();
   }
 };

@@ -15,7 +15,6 @@ wss.on('connection', (ws) => {
   ws.on('message', (message: any) => {
     const response = JSON.parse(message.toString());
     const baseFileName = path.basename(response.importPath, '.stories.svelte');
-    console.log('[interaction-2-test] base name', baseFileName);
     // The importPath is the path to the stories file, we need to find the svelte file that gets imported in
     const regex = new RegExp(`((import).*(${baseFileName}))`);
     // Get file content from STORYBOOK
@@ -25,11 +24,12 @@ wss.on('connection', (ws) => {
     // 1) See if the component of the same base name is imported in the stories.svelte file, and determine if it exists
     if (regex.test(storybookFileContent ?? '') && fs.existsSync(fullPathToComponentFile)) {
       // 1_2) Analyse code
-      analyseCode({ filePath: fullPathToComponentFile, parameters: response.parameters });
+      const result = analyseCode({ filePath: fullPathToComponentFile, parameters: response.parameters });
+      // 1_3) Send the result over to the client side
+      ws.send(JSON.stringify({ exportDeclarations: result, fileName: baseFileName, fileExtension: 'svelte' }));
     }
 
-    // 2) Otherwise, we'll have to traverse through the stories file to get Meta component attribute
-
+    // TODO: 2) Otherwise, we'll have to traverse through the stories file to find Meta and get its component attribute
   });
 });
 
