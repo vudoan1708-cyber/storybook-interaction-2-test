@@ -131,7 +131,8 @@ export default ({
                   
               }
             </>
-      };
+      }
+      <LiteralStyle>;</LiteralStyle>
     </CodeStyle>
   )
 };

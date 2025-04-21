@@ -46,4 +46,6 @@ What we can do is define our own “actors and scenes” from Storybook paramete
 - Root element is no longer `#root`, it is now the body inside the iframe element, so that it can catch events on Modal component as it is placed outside of element context.
 - Auto-recording settings implemented (there is a bit of a race condition where, initially, though the settings value has been retrieved, and record state has been set, actors definition is yet to come through and that causes the record function to never run). This is fixed by using `useEffect` on `STORY_RENDERED` state and settings status to set the recording state accordingly.
 - Reset the non-interactive actions on `STORY_RENDERED` event.
+- Minor update to colourise the semi colon in each code line.
+- Update component name and its arguments inside render lifecycle function on every `STORY_RENDERED` event.
 <br />

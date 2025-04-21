@@ -147,7 +147,17 @@ export default class DeclarationMapper {
       this.__currentDeclarations[kind][indexOfItemOfTheSameSource] = {
         ...this.__currentDeclarations[kind][indexOfItemOfTheSameSource],
         keywords: this.__variableKeywords,
-      }
+        callee: {
+          ...this.__currentDeclarations[kind][indexOfItemOfTheSameSource].callee,
+          arguments: [
+            componentName,
+            {
+              type: 'object',
+              properties: args,
+            },
+          ],
+        },
+      };
       return this;
     }
   }
