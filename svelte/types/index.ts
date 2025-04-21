@@ -1,10 +1,11 @@
 import { AlertColor } from '@mui/material';
 
 export type Status = 'on' | 'off';
-export type EventType = 'click' | 'hover' | 'input' | 'change';
+export type NonInteractiveEventType = 'waitForElementToBeRemoved';
+export type EventType = NonInteractiveEventType | 'click' | 'hover' | 'input' | 'change';
 export type Framework = 'svelte' | 'react' | 'angular';
 
-export type JestQuery = 'queryByTestId' | 'queryAllByTestId';
+export type JestQuery = 'queryByTestId' | 'queryAllByTestId' | 'waitForElementToBeRemoved';
 export type JestLifeCycleFunction =
   | JestQuery
   | 'beforeAll'
@@ -75,9 +76,9 @@ export type Argument =
   | number
   | ObjectExpression
   | FunctionExpression;
-export type JestMemberExpression<K extends 'logic' | 'declaration'> = {
+export type JestMemberExpression = {
   object: JestLifeCycleFunction;
-  property: K extends 'logic' ? string : string | undefined;
+  property?: string;
   arguments?: Array<Argument>;
 };
 export type ImportExportKind = 'named' | 'default';
@@ -90,13 +91,12 @@ export  type JestDeclarationExpression = {
   variableDeclaration: Array<{
     declarationSyntax: ImportExportKind;
     keywords: Set<JestQuery>;
-    callee: JestMemberExpression<'declaration'>;
+    callee: JestMemberExpression;
   }>;
 }
 export type JestExpressionStatement = {
   keyword?: JavascriptUntouchedKeyword;
-  callee: JestMemberExpression<'logic'>;
-  accessBy?: JestQuery;
+  callee: JestMemberExpression;
 };
 
 export type JestImportPath =

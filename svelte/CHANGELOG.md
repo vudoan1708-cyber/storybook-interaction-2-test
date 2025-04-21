@@ -41,4 +41,7 @@ What we can do is define our own “actors and scenes” from Storybook paramete
 ## [20/04/2025]
 - Revived the preset side to send over the file base name as well as the results of parsing svelte file content to get the initial values from export statements.
 - Removeable declaration statements is also implemented.
+## [21/04/2025]
+- Ignore the work for removing lifecycle functions as code lines are removed as they take so much time but bring very little value.
+- Root element is no longer #root, it is now the body inside the iframe element, so that it can catch events on Modal component as it is placed outside of element context.
 <br />

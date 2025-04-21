@@ -99,6 +99,7 @@ export default ({
   const [ imports, setImports ] = useState<JestDeclarationExpression['importDeclaration']>([]);
   const [ variables, setVariables ] = useState<JestDeclarationExpression['variableDeclaration']>([]);
   const [ testFramework, setTestFramework ] = useState('Jest');
+  const [ nonInteractiveElements, setNonInteractiveElements ] = useState<HTMLElement | Element | Node>();
 
   // Create ref to use updated variable inside useCallback
   const rootRef = useRef<HTMLElement | null>(null);
@@ -108,11 +109,64 @@ export default ({
   // Initialise Jest with a FE framework
   Jest.init(framework, component.componentName);
 
-  const recordChangesToDomTree = (status: Status) => {
-    new MutationObserver(() => {
-  
-    });
-  };
+  const recordChangesToDomTree = useCallback((status: Status) => {
+    let observer: MutationObserver | null = null;
+    console.log('status', status);
+    if (status === 'on') {
+      observer = new MutationObserver((mutations) => {
+        const filtered = mutations.find((mutation) => (
+          mutation.removedNodes.length > 0 ||
+          mutation.type === 'characterData'
+        ));
+
+        for (const item of filtered?.removedNodes || []) {
+          const testId = (item as HTMLElement).getAttribute('data-testid');
+          if (nonInteractiveElements === item) {
+            continue;
+          }
+
+          setNonInteractiveElements(item);
+
+          // Find out if there are more than 1 of the same elements on the UI
+          const elements = rootRef.current?.querySelectorAll(`[data-testid="${testId}"]`);
+          if (elements?.length === 0) {
+            return;
+          }
+          if (elements?.length === 1) {
+            processResult({
+              status: 'success',
+              target: {
+                eventType: 'waitForElementToBeRemoved',
+                accessBy: 'queryByTestId',
+                element: elements[0],
+                accessAtIndex: 0,
+              }
+            });
+            return;
+          }
+
+          processResult({
+            status: 'success',
+            target: {
+              eventType: 'waitForElementToBeRemoved',
+              accessBy: 'queryAllByTestId',
+              element: elements?.[0] ?? null,
+              accessAtIndex: 0,
+            }
+          });
+        }
+      });
+      observer.observe(rootRef.current as HTMLElement, {
+        childList: true,
+        subtree: true,
+      });
+      return;
+    }
+    if (status === 'off') {
+      console.log('observer', observer);
+      (observer as MutationObserver)?.disconnect();
+    }
+  }, []);
 
   // Process the result (alert if error or warn and set recorded step list if successful)
   const processResult = (result: UserEventResult | null) => {
@@ -145,6 +199,7 @@ export default ({
       input: () => onElementInputWithDebounce(e),
       change: () => onElementChange(rootRef.current as any, e, actorsRef.current),
       hover: () => null,
+      waitForElementToBeRemoved: () => null,
     };
     const result = elementWithDataTestId[e.type as EventType]();
     processResult(result);
@@ -153,7 +208,9 @@ export default ({
   const toggleListener = (status: Status) => {
     // get the iframe content window
     const frameElement = document.querySelector('iframe[data-is-storybook="true"]');
-    const rootElement: HTMLElement = (frameElement as any)?.contentDocument.querySelector('#root');
+    // Modal component aren't reachable as it is placed on the same level as body, not #root
+    // const rootElement: HTMLElement = (frameElement as any)?.contentDocument.querySelector('#root');
+    const rootElement: HTMLElement = (frameElement as any)?.contentDocument.body;
     // update the ref
     rootRef.current = rootElement;
     if (!rootRef.current) return;
@@ -183,13 +240,13 @@ export default ({
   
   const toggleRecorder = {
     on: () => {
-      recordChangesToDomTree('on');
       toggleListener('on');
+      // recordChangesToDomTree('on');
     },
     off: () => {
       // Remove event listener and stuff
-      recordChangesToDomTree('off');
       toggleListener('off');
+      // recordChangesToDomTree('off');
     }
   }
 

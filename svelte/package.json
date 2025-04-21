@@ -17,6 +17,12 @@
     ".": "./dist/manager.js",
     "./preset": "./dist/preset.js"
   },
+  "files": [
+    "package.json",
+    "package-lock.json",
+    "./dist",
+    "CHANGELOG.md"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",

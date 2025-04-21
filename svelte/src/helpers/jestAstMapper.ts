@@ -8,7 +8,7 @@ import {
   JestQuery,
   ObjectExpression,
   UserEventResult,
-} from "../../types";
+} from '../../types';
 
 export default class Jest {
   private static __testedComponentName: string;
@@ -120,6 +120,21 @@ export default class Jest {
         ],
       },
     };
+  }
+  public static waitForElementToBeRemoved(userEvent: UserEventResult['target']): JestExpressionStatement {
+    return {
+      keyword: 'await',
+      callee: {
+        object: 'waitForElementToBeRemoved',
+        arguments: [
+          this.__createArgs(
+            userEvent?.accessBy as JestQuery,
+            userEvent?.accessAtIndex ?? 0,
+            userEvent?.element?.getAttribute('data-testid'),
+          ),
+        ],
+      }
+    }
   }
 
   public static createDeclaration(accessBy: JestLifeCycleFunction, args: ObjectExpression['properties']) {

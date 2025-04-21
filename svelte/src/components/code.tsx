@@ -44,8 +44,9 @@ type ImportDeclarationStatement = {
 type VariableDeclarationStatement = {
   declarationSyntax: ImportExportKind;
   keywords: Set<JestQuery>;
-  callee: JestMemberExpression<'declaration'>;
+  callee: JestMemberExpression;
 };
+
 export default ({
   item,
   kind,
@@ -86,7 +87,16 @@ export default ({
         kind === 'statements'
           ? <>
               {(item as JestExpressionStatement).keyword ? <KeywordCode>{(item as JestExpressionStatement).keyword} </KeywordCode> : null}
-              <ObjectCode>{(item as JestExpressionStatement).callee.object}</ObjectCode><span style={{color: "white"}}>.</span><PropertyCode>{(item as JestExpressionStatement).callee.property}</PropertyCode>
+              <ObjectCode>{(item as JestExpressionStatement).callee.object}</ObjectCode>
+              {
+                (item as JestExpressionStatement).callee.property
+                  ? <>
+                      <span style={{color: "white"}}>.</span>
+                      <PropertyCode>{(item as JestExpressionStatement).callee.property}</PropertyCode>
+                    </>
+                  : null
+              }
+
               <ParenthesisStyle>
                 (
                   <ArgumentCode>
