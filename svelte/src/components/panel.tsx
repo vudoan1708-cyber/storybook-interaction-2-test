@@ -9,11 +9,13 @@ import Snackbar from '@mui/material/Snackbar';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import Chip from '@mui/material/Chip';
 
 import {
   RadioButtonChecked as RadioButtonCheckedIcon,
   Stop as StopIcon,
   FeaturedPlayList as FeaturedPlayListIcon,
+  SettingsSuggest as SettingsSuggestIcon,
 } from '@mui/icons-material';
 
 import styled from '@emotion/styled';
@@ -23,13 +25,13 @@ import PanelList from './panel_list';
 // Type
 import {
   Actors,
-  Argument,
   EventType,
   Framework,
   JestDeclarationExpression,
   JestExpressionStatement,
   JestQuery,
   ObjectExpression,
+  RecordingSettings,
   Status,
   UserEventResult,
 } from '../../types';
@@ -41,6 +43,7 @@ import {
   debounce,
   FRAMEWORK_TO_LOGO,
 } from '../helpers';
+import { getFromLocalStorage, saveToLocalStorage } from '../helpers/settings';
 
 const noActorsFoundErrorMessage = '[interaction-2-test] Could not find an actor. Please make sure you define at least 1 actor through i2t-actors property in your stories file';
 
@@ -61,7 +64,7 @@ const FooterStyle = styled.footer`
   align-items: center;
 `;
 
-const FrameworkDivStyle = styled.div`
+const InfoAndSettingsDevStyle = styled.div`
   display: inline-flex;
   gap: 16px;
   align-items: center;
@@ -75,6 +78,8 @@ const CustomSelectStyle = styled(Select)(({ theme }) => ({
     padding: '0 16px',
   },
 }));
+
+const initialSettings = getFromLocalStorage();
 
 export default ({
   active,
@@ -93,13 +98,16 @@ export default ({
     props: ObjectExpression['properties'],
   }
 }) => {
-  const [ recordState, setRecordState ] = useState<Status>('off');
+  const [ settings, setSettings ] = useState<RecordingSettings | null>(initialSettings);
+  const [ recordState, setRecordState ] = useState<Status>(settings?.status ?? 'off');
+
   const [ alerts, setAlert ] = useState<Array<{ message: string, style: AlertProps['severity'] }>>([]);
   const [ steps, setSteps ] = useState<Array<JestExpressionStatement>>([]);
   const [ imports, setImports ] = useState<JestDeclarationExpression['importDeclaration']>([]);
   const [ variables, setVariables ] = useState<JestDeclarationExpression['variableDeclaration']>([]);
+
   const [ testFramework, setTestFramework ] = useState('Jest');
-  const [ nonInteractiveElements, setNonInteractiveElements ] = useState<HTMLElement | Element | Node>();
+  const [ nonInteractiveElements, setNonInteractiveElements ] = useState<Set<string | null>>(new Set());
 
   // Create ref to use updated variable inside useCallback
   const rootRef = useRef<HTMLElement | null>(null);
@@ -109,9 +117,8 @@ export default ({
   // Initialise Jest with a FE framework
   Jest.init(framework, component.componentName);
 
-  const recordChangesToDomTree = useCallback((status: Status) => {
+  const recordChangesToDomTree = (status: Status) => {
     let observer: MutationObserver | null = null;
-    console.log('status', status);
     if (status === 'on') {
       observer = new MutationObserver((mutations) => {
         const filtered = mutations.find((mutation) => (
@@ -120,13 +127,12 @@ export default ({
         ));
 
         for (const item of filtered?.removedNodes || []) {
-          const testId = (item as HTMLElement).getAttribute('data-testid');
-          if (nonInteractiveElements === item) {
-            continue;
+          const testId = (item as HTMLElement)?.getAttribute('data-testid') ?? '';
+          if (nonInteractiveElements.has(testId)) {
+            break;
           }
 
-          setNonInteractiveElements(item);
-
+          setNonInteractiveElements((items) => items.add(testId));
           // Find out if there are more than 1 of the same elements on the UI
           const elements = rootRef.current?.querySelectorAll(`[data-testid="${testId}"]`);
           if (elements?.length === 0) {
@@ -162,11 +168,7 @@ export default ({
       });
       return;
     }
-    if (status === 'off') {
-      console.log('observer', observer);
-      (observer as MutationObserver)?.disconnect();
-    }
-  }, []);
+  };
 
   // Process the result (alert if error or warn and set recorded step list if successful)
   const processResult = (result: UserEventResult | null) => {
@@ -241,12 +243,12 @@ export default ({
   const toggleRecorder = {
     on: () => {
       toggleListener('on');
-      // recordChangesToDomTree('on');
+      recordChangesToDomTree('on');
     },
     off: () => {
       // Remove event listener and stuff
       toggleListener('off');
-      // recordChangesToDomTree('off');
+      recordChangesToDomTree('off');
     }
   }
 
@@ -274,16 +276,30 @@ export default ({
           style: 'error',
         }
       ]);
+    } else if (actorsRef.current) {
+      setAlert([]);
     }
     // If story is not rendered
     if (!storyRendered) {
       setRecordState('off');
       setSteps([]);
+      setImports([]);
+      setVariables([]);
+      setNonInteractiveElements((items) => {
+        items.clear();
+        return items;
+      });
     }
   }, [ actors, storyRendered ]);
   useEffect(() => {
     componentRef.current = component;
   }, [ component ]);
+  useEffect(() => {
+    if (settings?.status === 'on' && storyRendered) {
+      setRecordState('on');
+    }
+    saveToLocalStorage(settings ?? { status: 'off' });
+  }, [ settings, storyRendered ]);
 
   return (
     <AddonPanel active={active}>
@@ -330,7 +346,22 @@ export default ({
           </Button>
         </Tooltip>
 
-        <FrameworkDivStyle>
+        <InfoAndSettingsDevStyle>
+          <Chip
+            icon={<SettingsSuggestIcon style={{ color: settings?.status === 'off' ? 'white' : 'black' }} />}
+            sx={{
+              backgroundColor: settings?.status === 'off' ? 'transparent' : 'white',
+              '& .MuiChip-label': {
+                color: settings?.status === 'off' ? 'white' : 'black',
+              },
+              '&:hover': {
+                backgroundColor: 'rgba(200, 200, 200, .75) !important',
+              }
+            }}
+            variant="outlined"
+            label={`Auto-record: ${settings?.status?.toUpperCase() ?? 'OFF'}`}
+            clickable
+            onClick={() => { setSettings((sett) => ({ status: (sett?.status || 'on') === 'on' ? 'off' : 'on' })) }} />
           <FormControl
             size="small"
             color="primary"
@@ -349,7 +380,7 @@ export default ({
           |
 
           <div style={{ display: "flex", width: "20px" }}><img src={FRAMEWORK_TO_LOGO[framework]} /></div>
-        </FrameworkDivStyle>
+        </InfoAndSettingsDevStyle>
       </FooterStyle>
     </AddonPanel>
   );

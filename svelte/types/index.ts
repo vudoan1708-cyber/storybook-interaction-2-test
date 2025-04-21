@@ -114,3 +114,8 @@ export type DeclarationTemplate = {
     declarationSyntax: ImportExportKind;
   };
 };
+
+// Settings
+export type RecordingSettings = {
+  status: Status;
+};

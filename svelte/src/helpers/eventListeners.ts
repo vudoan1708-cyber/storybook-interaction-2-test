@@ -46,6 +46,8 @@ const __getElementByDataTestId = (
   // if target element has a data-testid attribute and has the same event type
   const attributeValue = target?.getAttribute('data-testid');
   if (attributeValue) {
+    console.log(actors);
+    console.log(attributeValue);
     if (actors[attributeValue] === eventType) {
       const found = __checkIfMany(root, target as HTMLElement, attributeValue);
       const returnObj = {
@@ -63,10 +65,7 @@ const __getElementByDataTestId = (
         target: { ...found, eventType },
       };
     }
-    return {
-      status: 'warning',
-      message: `No matching event found on the ${(target as any)?.nodeName} element with the last event: ${eventType}`,
-    };
+    return __getElementByDataTestId(root, target?.parentElement, eventType, actors);
   }
   return __getElementByDataTestId(root, target?.parentElement, eventType, actors);
 };

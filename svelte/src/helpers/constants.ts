@@ -12,3 +12,5 @@ export const FRAMEWORK_TO_LOGO = {
   react: '',
   angular: '',
 };
+
+export const LOCAL_STORAGE_KEY = 'storybook/interaction-2-test/settings';

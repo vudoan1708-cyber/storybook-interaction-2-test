@@ -36,10 +36,10 @@ export default class Jest {
     testId?: string | null,
   ): Argument {
     if (accessBy === 'queryByTestId') {
-      return `${accessBy}("${testId}")`;
+      return `${accessBy}('${testId}')`;
     }
     if (accessBy === 'queryAllByTestId') {
-      return `${accessBy}("${testId}")[${accessAtIndex}]`;
+      return `${accessBy}('${testId}')[${accessAtIndex}]`;
     }
     return '';
   }

@@ -131,7 +131,7 @@ export default ({
                   
               }
             </>
-      }
+      };
     </CodeStyle>
   )
 };
