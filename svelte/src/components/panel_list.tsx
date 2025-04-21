@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -12,15 +12,20 @@ import { JestDeclarationExpression, JestExpressionStatement } from '../../types'
 
 export default ({
   actionList,
-  onItemRemove,
   importList,
   variableList,
+  onItemRemove,
+  onImportItemRemove,
+  onVariableItemRemove,
 }: {
   actionList: Array<JestExpressionStatement>,
-  onItemRemove: (idx: number) => void,
   importList: JestDeclarationExpression['importDeclaration'],
   variableList: JestDeclarationExpression['variableDeclaration'],
+  onItemRemove: (idx: number) => void,
+  onImportItemRemove: (idx: number) => void,
+  onVariableItemRemove: (idx: number) => void,
 }) => {
+  const [ noList, setNoList ] = useState<boolean>(true);
   const footerRef = useRef<HTMLElement | null>(null);
   const headerRef = useRef<HTMLElement | null>(null);
 
@@ -34,6 +39,9 @@ export default ({
     footerRef.current = document.querySelector('footer');
     headerRef.current = document.querySelector('#i2t-header');
   }, []);
+  useEffect(() => {
+    setNoList(importList.length === 0 && variableList.length === 0 && actionList.length === 0);
+  }, [ importList, variableList, actionList ]);
 
   return (
     <OlStyle footerHeight={footerRef.current?.offsetHeight ?? 0} headerHeight={headerRef.current?.offsetHeight ?? 0}>
@@ -42,6 +50,11 @@ export default ({
             importList?.map((item, idx) => (
               <li key={idx}>
                 <Code item={item} kind="importDeclarations" />
+                <Tooltip title="Remove" arrow>
+                  <IconButton aria-label="delete" onClick={() => { onImportItemRemove(idx); }}>
+                    <DeleteIcon />
+                  </IconButton>
+                </Tooltip>
               </li>
             ))
           )
@@ -52,6 +65,11 @@ export default ({
           variableList?.map((item, idx) => (
               <li key={idx}>
                 <Code item={item} kind="variableDeclarations" />
+                <Tooltip title="Remove" arrow>
+                  <IconButton aria-label="delete" onClick={() => { onVariableItemRemove(idx); }}>
+                    <DeleteIcon />
+                  </IconButton>
+                </Tooltip>
               </li>
             ))
           )
@@ -71,8 +89,10 @@ export default ({
                 </li>
               ))
             )
-          : <h3 style={{ textAlign: 'center', color: 'rgb(100, 100, 100)' }}>No user interactions found.</h3>
+          : null
       }
+
+      {noList ? <h3 style={{ textAlign: 'center', color: 'rgb(100, 100, 100)' }}>No user interactions found.</h3> : null}
     </OlStyle>
   )
 }

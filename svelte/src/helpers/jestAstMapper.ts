@@ -4,6 +4,7 @@ import {
   Argument,
   Framework,
   JestExpressionStatement,
+  JestLifeCycleFunction,
   JestQuery,
   ObjectExpression,
   UserEventResult,
@@ -11,6 +12,10 @@ import {
 
 export default class Jest {
   private static __testedComponentName: string;
+  /** @description To keep track of the events so that they can be completele removed as user removing the recorded steps */
+  private static __eventCounter: {
+    [x in JestLifeCycleFunction]: number;
+  };
 
   constructor() {}
 
@@ -117,9 +122,15 @@ export default class Jest {
     };
   }
 
-  public static createDeclaration(accessBy: JestQuery, args: ObjectExpression['properties']) {
+  public static createDeclaration(accessBy: JestLifeCycleFunction, args: ObjectExpression['properties']) {
     return DeclarationMapper
       .includeNewDeclaration(accessBy, this.__testedComponentName, args)
       ?.getAllDeclarations();
   }
+
+  // public static removeDeclaration(accessBy: JestLifeCycleFunction) {
+  //   return DeclarationMapper
+  //     .removeDeclaration(accessBy)
+  //     ?.getAllDeclarations();
+  // }
 };

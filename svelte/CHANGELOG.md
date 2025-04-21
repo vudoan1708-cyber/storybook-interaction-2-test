@@ -40,4 +40,5 @@ What we can do is define our own “actors and scenes” from Storybook paramete
 - Updated the UI to display framework logo and test framework selection for future iteration on other test frameworks.
 ## [20/04/2025]
 - Revived the preset side to send over the file base name as well as the results of parsing svelte file content to get the initial values from export statements.
+- Removeable declaration statements is also implemented.
 <br />

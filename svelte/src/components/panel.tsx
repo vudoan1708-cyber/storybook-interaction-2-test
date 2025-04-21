@@ -194,7 +194,14 @@ export default ({
   }
 
   const onItemRemove = (removingIdx: number) => {
-    setSteps((steps) => steps.filter((_, idx) => idx !== removingIdx));
+    let removingItem = steps[removingIdx];
+    setSteps((items) => items.filter((_, idx) => idx !== removingIdx));
+  };
+  const onImportItemRemove = (removingIdx: number) => {
+    setImports((items) => items.filter((_, idx) => idx !== removingIdx));
+  };
+  const onVariableItemRemove = (removingIdx: number) => {
+    setVariables((items) => items.filter((_, idx) => idx !== removingIdx));
   };
 
   // Life Cycle
@@ -231,7 +238,9 @@ export default ({
         actionList={steps}
         importList={imports}
         variableList={variables}
-        onItemRemove={onItemRemove} />
+        onItemRemove={onItemRemove}
+        onImportItemRemove={onImportItemRemove}
+        onVariableItemRemove={onVariableItemRemove} />
 
       {alerts.map((alert, idx) => (
         <Snackbar

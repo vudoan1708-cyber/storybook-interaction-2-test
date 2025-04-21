@@ -68,9 +68,15 @@ export type ObjectExpression = {
     | { key: string; value: Argument }
     | Array<{ key: string; value: Argument }>
 };
-export type Argument = HTMLElement | Element | string | number | ObjectExpression | FunctionExpression;
+export type Argument =
+  | HTMLElement
+  | Element
+  | string
+  | number
+  | ObjectExpression
+  | FunctionExpression;
 export type JestMemberExpression<K extends 'logic' | 'declaration'> = {
-  object: string;
+  object: JestLifeCycleFunction;
   property: K extends 'logic' ? string : string | undefined;
   arguments?: Array<Argument>;
 };
@@ -90,6 +96,7 @@ export  type JestDeclarationExpression = {
 export type JestExpressionStatement = {
   keyword?: JavascriptUntouchedKeyword;
   callee: JestMemberExpression<'logic'>;
+  accessBy?: JestQuery;
 };
 
 export type JestImportPath =

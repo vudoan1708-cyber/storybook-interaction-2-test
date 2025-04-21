@@ -62,7 +62,7 @@ export default ({
         ${
           Array.isArray(arg.properties)
             ? (arg.properties as Array<{ key: string; value: Argument }>).map((prop) => `${prop.key}: ${generateArguments(prop.value)}`).join(', ')
-            : (arg.properties as { key: string; value: Argument }).key}: ${generateArguments((arg.properties as { key: string; value: Argument }).value)
+            : `${(arg.properties as { key: string; value: Argument }).key}: ${generateArguments((arg.properties as { key: string; value: Argument }).value)}`
           }
       }`;
     }

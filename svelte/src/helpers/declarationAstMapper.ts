@@ -33,6 +33,58 @@ export default class DeclarationMapper {
       queryAllByTestId: { kind: 'variableDeclaration', from: 'render', declarationSyntax: 'named' },
     };
   }
+  // public static removeDeclaration(
+  //   lifeCycleFunction: JestLifeCycleFunction,
+  //   eventCounter: number,
+  // ) {
+  //   const { kind, from } = this.__declarationTemplate[lifeCycleFunction];
+  //   if (kind === 'importDeclaration') {
+  //     // Only deleting the keyword if it's no longer used in the recorded steps
+  //     if (eventCounter === 1) {
+  //       this.__importKeywords.delete(lifeCycleFunction as Exclude<JestLifeCycleFunction, JestQuery>);
+  //     }
+  //     const indexOfItemOfTheSameLifecycle = this.__currentDeclarations[kind].findIndex((item) => item?.keywords.has(lifeCycleFunction));
+      
+  //     // First timer for the source to be included in the array
+  //     if (indexOfItemOfTheSameLifecycle === -1) {
+  //       return this;
+  //     }
+  //     // If there is at least 1 lifecycle function after removal
+  //     if (this.__currentDeclarations[kind][indexOfItemOfTheSameLifecycle].keywords.size > 1) {
+  //       this.__currentDeclarations[kind][indexOfItemOfTheSameLifecycle] = {
+  //         ...this.__currentDeclarations[kind][indexOfItemOfTheSameLifecycle],
+  //         keywords: this.__importKeywords,
+  //       }
+  //       return this;
+  //     }
+  //     // Otherwise, if nothing is left after removal
+  //     this.__currentDeclarations[kind] = this.__currentDeclarations[kind].filter((_, idx) => idx !== indexOfItemOfTheSameLifecycle);
+  //     return this;
+  //   }
+  //   if (kind === 'variableDeclaration') {
+  //     // Only deleting the keyword if it's no longer used in the recorded steps
+  //     if (eventCounter === 1) {
+  //       this.__variableKeywords.delete(lifeCycleFunction as JestQuery);
+  //     }
+  //     const indexOfItemOfTheSameLifecycle = this.__currentDeclarations[kind].findIndex((item) => item?.keywords.has(lifeCycleFunction as JestQuery));
+      
+  //     // First timer for the source to be included in the array
+  //     if (indexOfItemOfTheSameLifecycle === -1) {
+  //       return this;
+  //     }
+  //     // If there is at least 1 lifecycle function after removal
+  //     if (this.__currentDeclarations[kind][indexOfItemOfTheSameLifecycle].keywords.size > 1) {
+  //       this.__currentDeclarations[kind][indexOfItemOfTheSameLifecycle] = {
+  //         ...this.__currentDeclarations[kind][indexOfItemOfTheSameLifecycle],
+  //         keywords: this.__variableKeywords,
+  //       }
+  //       return this;
+  //     }
+  //     // Otherwise, if nothing is left after removal
+  //     this.__currentDeclarations[kind] = this.__currentDeclarations[kind].filter((_, idx) => idx !== indexOfItemOfTheSameLifecycle);
+  //     return this;
+  //   }
+  // }
 
   public static includeNewDeclaration(
     lifeCycleFunction: JestLifeCycleFunction,
@@ -98,6 +150,16 @@ export default class DeclarationMapper {
       }
       return this;
     }
+  }
+
+  public static doesKeywordStillExist(kind: DeclarationTemplate[JestLifeCycleFunction]['kind'], lifeCycleFunction: JestLifeCycleFunction) {
+    if (kind === 'importDeclaration') {
+      return this.__importKeywords.has(lifeCycleFunction as Exclude<JestLifeCycleFunction, JestQuery>);
+    }
+    if (kind === 'variableDeclaration') {
+      return this.__variableKeywords.has(lifeCycleFunction as JestQuery);
+    }
+    return false;
   }
 
   public static getAllDeclarations() {
