@@ -39,15 +39,13 @@ const __getElementByDataTestId = (
   const parentIsRoot = target?.parentElement?.querySelector('#root');
   if (parentIsRoot) {
     return {
-      status: 'error',
-      message: `${(target as any)?.nodeName} doesn't have a data-testid and neither do its parent elements`,
+      status: 'warning',
+      message: `No matching event found on the ${(target as any)?.nodeName} element with the last event: ${eventType}`,
     };
   }
   // if target element has a data-testid attribute and has the same event type
   const attributeValue = target?.getAttribute('data-testid');
   if (attributeValue) {
-    console.log(actors);
-    console.log(attributeValue);
     if (actors[attributeValue] === eventType) {
       const found = __checkIfMany(root, target as HTMLElement, attributeValue);
       const returnObj = {

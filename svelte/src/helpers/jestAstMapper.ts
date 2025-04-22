@@ -136,6 +136,20 @@ export default class Jest {
       }
     }
   }
+  public static expect(userEvent: UserEventResult['target']): JestExpressionStatement {
+    return {
+      callee: {
+        object: 'expect',
+        arguments: [
+          this.__createArgs(
+            userEvent?.accessBy as JestQuery,
+            userEvent?.accessAtIndex ?? 0,
+            userEvent?.element?.getAttribute('data-testid'),
+          ),
+        ],
+      }
+    }
+  }
 
   public static createDeclaration(accessBy: JestLifeCycleFunction, args: ObjectExpression['properties']) {
     return DeclarationMapper

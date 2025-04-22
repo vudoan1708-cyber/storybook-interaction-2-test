@@ -48,4 +48,8 @@ What we can do is define our own “actors and scenes” from Storybook paramete
 - Reset the non-interactive actions on `STORY_RENDERED` event.
 - Minor update to colourise the semi colon in each code line.
 - Update component name and its arguments inside render lifecycle function on every `STORY_RENDERED` event.
+## [22/04/2025]
+- Trying to use `MutationObserver` to detect `removedNodes` and guesstimate that as a candidate for the `waitForElementToBeRemoved` function, alongside with filtering techniques to reduce noisy elements / nodes that aren't relevant.
+- Trying to use `MutationObserver` to detect `addedNodes` and guesstimate that as a candidate for the `expect` function. Not so successful for now.
+- Working on the modal that allows developers to select an expect outcome themselves.
 <br />

@@ -14,3 +14,11 @@ export const FRAMEWORK_TO_LOGO = {
 };
 
 export const LOCAL_STORAGE_KEY = 'storybook/interaction-2-test/settings';
+
+export const EXPECT_STATEMENTS = [
+  'toBeInTheDocument',
+  'toBeNull',
+  'toHaveTextContent',
+  'toHaveStyle',
+  'toHaveLength',
+];

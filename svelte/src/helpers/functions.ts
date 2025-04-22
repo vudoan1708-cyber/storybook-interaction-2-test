@@ -8,3 +8,12 @@ export const debounce = <T extends (...args: any[]) => void>(fn: T, delay: numbe
 
   return debouncedFn as T;
 };
+
+export const sleep = (delay = 50): Promise<void> => {
+  return new Promise((resolve) => {
+    const timeout = setTimeout(() => {
+      clearTimeout(timeout);
+      resolve();
+    }, delay);
+  });
+}

@@ -1,11 +1,11 @@
 import { AlertColor } from '@mui/material';
 
 export type Status = 'on' | 'off';
-export type NonInteractiveEventType = 'waitForElementToBeRemoved';
+export type NonInteractiveEventType = 'waitForElementToBeRemoved' | 'expect';
 export type EventType = NonInteractiveEventType | 'click' | 'hover' | 'input' | 'change';
 export type Framework = 'svelte' | 'react' | 'angular';
 
-export type JestQuery = 'queryByTestId' | 'queryAllByTestId' | 'waitForElementToBeRemoved';
+export type JestQuery = 'queryByTestId' | 'queryAllByTestId' | NonInteractiveEventType;
 export type JestLifeCycleFunction =
   | JestQuery
   | 'beforeAll'

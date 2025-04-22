@@ -21,6 +21,7 @@ import {
 import styled from '@emotion/styled';
 
 import PanelList from './panel_list';
+import Modal from './modal';
 
 // Type
 import {
@@ -107,7 +108,10 @@ export default ({
   const [ variables, setVariables ] = useState<JestDeclarationExpression['variableDeclaration']>([]);
 
   const [ testFramework, setTestFramework ] = useState('Jest');
-  const [ nonInteractiveElements, setNonInteractiveElements ] = useState<Set<string | null>>(new Set());
+  const [ nonInteractiveElements, setNonInteractiveElements ] = useState<Set<Element>>(new Set());
+  const [ potentialElementsToExpect, setPotentialElementsToExpect ] = useState<Set<Element>>(new Set());
+
+  const [ observer, setObserver ] = useState<MutationObserver>();
 
   // Create ref to use updated variable inside useCallback
   const rootRef = useRef<HTMLElement | null>(null);
@@ -117,26 +121,47 @@ export default ({
   // Initialise Jest with a FE framework
   Jest.init(framework, component.componentName);
 
-  const recordChangesToDomTree = (status: Status) => {
-    let observer: MutationObserver | null = null;
-    if (status === 'on') {
-      observer = new MutationObserver((mutations) => {
-        const filtered = mutations.find((mutation) => (
-          mutation.removedNodes.length > 0 ||
-          mutation.type === 'characterData'
-        ));
+  const resetElementSets = {
+    option1() {
+      setNonInteractiveElements((elements) => {
+        elements.clear();
+        return elements;
+      });
+    },
+    option2() {
+      setPotentialElementsToExpect((elements) => {
+        elements.clear();
+        return elements;
+      });
+    },
+    both() {
+      this.option1();
+      this.option2();
+    }
+  };
 
-        for (const item of filtered?.removedNodes || []) {
-          const testId = (item as HTMLElement)?.getAttribute('data-testid') ?? '';
-          if (nonInteractiveElements.has(testId)) {
+  const recordChangesToDomTree = (status: Status) => {
+    if (status === 'on') {
+      const mutationObserver = new MutationObserver((mutations) => {
+        const removedElements = mutations
+          .filter((mutation) => mutation.removedNodes.length > 0)
+          .map((mutation) => Array.from(mutation.removedNodes))
+          .flat()
+          // Make sure they are elements and not nodes (like TEXT node for example)
+          .filter((node): node is Element => node.nodeType === Node.ELEMENT_NODE)
+          .filter((element) => element.getAttribute('data-testid'));
+
+        for (const item of removedElements || []) {
+          const testId = item.getAttribute('data-testid') ?? '';
+          if (!testId || nonInteractiveElements.has(item)) {
             break;
           }
 
-          setNonInteractiveElements((items) => items.add(testId));
-          // Find out if there are more than 1 of the same elements on the UI
-          const elements = rootRef.current?.querySelectorAll(`[data-testid="${testId}"]`);
+          setNonInteractiveElements((items) => items.add(item));
+          // Find out if there are more than 1 of the same elements removed from the UI
+          const elements = removedElements.filter((element) => element.getAttribute('data-testid')  === testId);
           if (elements?.length === 0) {
-            return;
+            continue;
           }
           if (elements?.length === 1) {
             processResult({
@@ -161,12 +186,43 @@ export default ({
             }
           });
         }
+
+        const addedElements = mutations
+          .filter((mutation) => mutation.removedNodes.length > 0 || mutation.addedNodes.length > 0)
+          .map((mutation) => [ ...mutation.removedNodes, ...mutation.addedNodes ])
+          .flat()
+          // Make sure they are elements and not nodes (like TEXT node for example)
+          .filter((node): node is Element => node.nodeType === Node.ELEMENT_NODE)
+          .filter((element) => element.getAttribute('data-testid'));
+
+        if (addedElements.length === 0) return;
+
+        setPotentialElementsToExpect(new Set(addedElements.filter((element) => !nonInteractiveElements.has(element))));
       });
-      observer.observe(rootRef.current as HTMLElement, {
+      setObserver(mutationObserver);
+      mutationObserver.observe(rootRef.current as HTMLElement, {
         childList: true,
+        attributes: true,
         subtree: true,
       });
       return;
+    }
+
+    if (status === 'off') {
+      if (potentialElementsToExpect.size === 0) return;
+      for (const value of potentialElementsToExpect.values()) {
+        console.log('value', value);
+      }
+      processResult({
+        status: 'success',
+        target: {
+          eventType: 'expect',
+          accessBy: 'queryByTestId',
+          element: [ ...potentialElementsToExpect ][potentialElementsToExpect.size - 1],
+          accessAtIndex: 0,
+        }
+      });
+      observer?.disconnect();
     }
   };
 
@@ -202,6 +258,7 @@ export default ({
       change: () => onElementChange(rootRef.current as any, e, actorsRef.current),
       hover: () => null,
       waitForElementToBeRemoved: () => null,
+      expect: () => null,
     };
     const result = elementWithDataTestId[e.type as EventType]();
     processResult(result);
@@ -285,10 +342,7 @@ export default ({
       setSteps([]);
       setImports([]);
       setVariables([]);
-      setNonInteractiveElements((items) => {
-        items.clear();
-        return items;
-      });
+      resetElementSets.both();
     }
   }, [ actors, storyRendered ]);
   useEffect(() => {
@@ -330,6 +384,13 @@ export default ({
           </Alert>
         </Snackbar>
       ))}
+
+      {/* Modal */}
+      {
+        recordState === 'off' && potentialElementsToExpect.size > 0
+          ? <Modal elements={Array.from(potentialElementsToExpect)} onClose={() => { resetElementSets.option2(); }} />
+          : null
+      }
 
       {/* Footer */}
       <FooterStyle>
