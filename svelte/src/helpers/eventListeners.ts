@@ -1,4 +1,4 @@
-import { Actors, EventType, UserEventResult } from "../../types";
+import { Actors, EventType, NonInteractiveEventType, UserEventResult } from "../../types";
 
 const __checkIfMany = (
   root: HTMLElement,
@@ -33,7 +33,7 @@ const __checkIfMany = (
 const __getElementByDataTestId = (
   root: HTMLElement,
   target: HTMLElement | null | undefined,
-  eventType: EventType,
+  eventType: EventType | NonInteractiveEventType,
   actors: Actors
 ): UserEventResult => {
   const parentIsRoot = target?.parentElement?.querySelector('#root');

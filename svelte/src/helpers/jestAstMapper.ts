@@ -5,6 +5,7 @@ import {
   Framework,
   JestExpressionStatement,
   JestLifeCycleFunction,
+  JestMemberExpression,
   JestQuery,
   ObjectExpression,
   UserEventResult,
@@ -71,7 +72,7 @@ export default class Jest {
             userEvent?.accessAtIndex ?? 0,
             userEvent?.element?.getAttribute('data-testid'),
           ),
-          `"${value}"`,
+          `'${value}'`,
         ],
       },
     };
@@ -96,7 +97,7 @@ export default class Jest {
                 type: 'object',
                 properties: {
                   key: 'value',
-                  value: `"${value}"`,
+                  value: `'${value}'`,
                 },
               },
             },
@@ -136,7 +137,18 @@ export default class Jest {
       }
     }
   }
-  public static expect({ userEvent, extraInfo }: { userEvent: UserEventResult['target'], extraInfo?: {} }): JestExpressionStatement {
+  public static expect({ userEvent, chainingOperations }: { userEvent: UserEventResult['target'], chainingOperations: Record<string, any> }): JestExpressionStatement {
+    const values = Object.values(chainingOperations).filter((value) => value);
+    const createChainingOperations = (values: Array<string>, idx: number): JestExpressionStatement => {
+      return {
+        callee: {
+          object: values[idx] as JestLifeCycleFunction,
+          arguments: [],
+          chained: idx === values.length - 1 ? undefined : createChainingOperations(values, idx + 1),
+          noParen: values[idx] === 'not',
+        }
+      };
+    }
     return {
       callee: {
         object: 'expect',
@@ -147,6 +159,7 @@ export default class Jest {
             userEvent?.element?.getAttribute('data-testid'),
           ),
         ],
+        chained: createChainingOperations(values, 0),
       }
     }
   }

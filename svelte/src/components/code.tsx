@@ -81,32 +81,53 @@ export default ({
     }
     return '';
   };
-  return (
-    <CodeStyle>
-      {
-        kind === 'statements'
-          ? <>
-              {(item as JestExpressionStatement).keyword ? <KeywordCode>{(item as JestExpressionStatement).keyword} </KeywordCode> : null}
-              <ObjectCode>{(item as JestExpressionStatement).callee.object}</ObjectCode>
-              {
-                (item as JestExpressionStatement).callee.property
-                  ? <>
-                      <span style={{color: "white"}}>.</span>
-                      <PropertyCode>{(item as JestExpressionStatement).callee.property}</PropertyCode>
-                    </>
-                  : null
-              }
 
+  const generateStatementLine = (statement: JestExpressionStatement): React.JSX.Element => {
+    return (
+      <>
+        {statement.keyword ? <KeywordCode>{statement.keyword} </KeywordCode> : null}
+        <ObjectCode>{statement.callee.object}</ObjectCode>
+        {
+          statement.callee.property
+            ? <>
+                <span style={{color: "white"}}>.</span>
+                <PropertyCode>{statement.callee.property}</PropertyCode>
+              </>
+            : null
+        }
+
+        {
+          statement.callee.noParen
+            ? null
+            : (
               <ParenthesisStyle>
                 (
                   <ArgumentCode>
-                    {(item as JestExpressionStatement).callee.arguments
+                    {statement.callee.arguments
                       ?.map((arg) => generateArguments(arg))
                       .join(', ')}
                   </ArgumentCode>
                 )
               </ParenthesisStyle>
-            </>
+              )
+        }
+
+        {
+          statement.callee.chained
+            ? <>
+                <span style={{color: "white"}}>.</span>{generateStatementLine(statement.callee.chained)}
+              </>
+            : null
+        }
+      </>
+    )
+  };
+
+  return (
+    <CodeStyle>
+      {
+        kind === 'statements'
+          ? generateStatementLine(item as JestExpressionStatement)
           : <>
               <KeywordCode>{kind === 'importDeclarations' ? 'import ' : 'const '}</KeywordCode>
               <ObjectCode>{generateDeclarationProperty(item as ImportDeclarationStatement)} </ObjectCode>

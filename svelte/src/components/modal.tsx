@@ -34,7 +34,7 @@ export default ({
 }: {
   elements: Element[],
   onClose: () => void,
-  onSubmit: ({ element, not, outcome }: { element: Element | null, not: boolean, outcome: string }) => void,
+  onSubmit: ({ element, negation, outcome }: { element: Element | null, negation: string, outcome: string }) => void,
 }) => {
   const [ step, setStep ] = useState<number>(1);
   const [ flagElements, setFlagElements ] = useState<FlagElement[]>(elements.map((element) => ({ element, flag: false })));
@@ -58,7 +58,7 @@ export default ({
     if (step > 1) {
       onSubmit({
         element: flagElements.find((object) => object.flag)?.element ?? null,
-        not,
+        negation: not ? 'not' : '',
         outcome,
       });
     }

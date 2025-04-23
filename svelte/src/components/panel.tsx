@@ -31,6 +31,7 @@ import {
   JestDeclarationExpression,
   JestExpressionStatement,
   JestQuery,
+  NonInteractiveEventType,
   ObjectExpression,
   RecordingSettings,
   Status,
@@ -182,7 +183,9 @@ export default ({
         }
 
         const addedElements = mutations
-          .filter((mutation) => mutation.removedNodes.length > 0 || mutation.addedNodes.length > 0)
+          .filter((mutation) => (
+            mutation.removedNodes.length > 0 || mutation.addedNodes.length > 0 || mutation.type === 'characterData'
+          ))
           .map((mutation) => [ ...mutation.removedNodes, ...mutation.addedNodes ])
           .flat()
           // Make sure they are elements and not nodes (like TEXT node for example)
@@ -190,7 +193,6 @@ export default ({
           .filter((element) => element.getAttribute('data-testid'));
 
         if (addedElements.length === 0) return;
-        // TODO: Doing this is not correct, it won't utilise the check for duplicate functionality here
         addedElements.forEach((element) => {
           setPotentialElementsToExpect((items) => items.add(element));
         });
@@ -199,6 +201,7 @@ export default ({
       mutationObserver.observe(rootRef.current as HTMLElement, {
         childList: true,
         attributes: true,
+        characterData: true,
         subtree: true,
       });
       return;
@@ -210,17 +213,17 @@ export default ({
   };
 
   // Process the result (alert if error or warn and set recorded step list if successful)
-  const processResult = (result: UserEventResult | null, extraInfo?: {}) => {
+  const processResult = (result: UserEventResult | null, chainingOperations?: {}) => {
     if (result?.status === 'error' || result?.status === 'warning') {
       setAlert((prev) => [ ...prev, { message: result?.message as string, style: result?.status } ]);
       return;
     }
     if (result?.status === 'success') {
       // Use User interaction to Jest code mapper here
-      const recordedStep = Jest[result.target?.eventType as EventType]({
+      const recordedStep = Jest[result.target?.eventType as EventType | Extract<NonInteractiveEventType, 'waitForElementToBeRemoved' | 'expect'>]({
         userEvent: result.target,
         value: (result.target?.element as HTMLInputElement)?.value ?? '',
-        extraInfo,
+        chainingOperations: chainingOperations ?? {},
       });
       setSteps((items) => [ ...items, recordedStep ]);
       // Check for imports or declaration
@@ -244,8 +247,6 @@ export default ({
       input: () => onElementInputWithDebounce(e),
       change: () => onElementChange(rootRef.current as any, e, actorsRef.current),
       hover: () => null,
-      waitForElementToBeRemoved: () => null,
-      expect: () => null,
     };
     const result = elementWithDataTestId[e.type as EventType]();
     processResult(result);
@@ -378,7 +379,7 @@ export default ({
           ? <Modal
               elements={Array.from(potentialElementsToExpect)}
               onClose={() => { resetElementSets.option2(); }}
-              onSubmit={({ element, not, outcome }: { element: Element | null, not: boolean, outcome: string }) => {
+              onSubmit={({ element, negation, outcome }: { element: Element | null, negation: string, outcome: string }) => {
                 if (potentialElementsToExpect.size === 0) return;
                 processResult(
                   {
@@ -391,10 +392,11 @@ export default ({
                     }
                   },
                   {
-                    not,
+                    negation,
                     outcome,
                   },
                 );
+                resetElementSets.option2();
               }} />
           : null
       }

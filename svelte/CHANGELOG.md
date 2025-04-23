@@ -52,4 +52,7 @@ What we can do is define our own “actors and scenes” from Storybook paramete
 - Trying to use `MutationObserver` to detect `removedNodes` and guesstimate that as a candidate for the `waitForElementToBeRemoved` function, alongside with filtering techniques to reduce noisy elements / nodes that aren't relevant.
 - Trying to use `MutationObserver` to detect `addedNodes` and guesstimate that as a candidate for the `expect` function. Not so successful for now.
 - Working on the modal that allows developers to select an expect outcome themselves.
+## [23/04/2025]
+- Finalising with the expect statements, this is so difficult as it's more of a guesstimate job from the addon perspective rather than something solid if this is just based purely on MutationObserver. Nevertheless, I decided to let the developer to choose what the expect outcome they'd like it to be based on some more on-screen selection UI flows and hence settle down the most appropriate statement.
+- With a bit of testing, it seems that the UI mapping is quite fine and accurate, the expect statement on the other hand, is still very much lacking of accuracy.
 <br />

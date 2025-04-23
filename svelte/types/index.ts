@@ -1,13 +1,14 @@
 import { AlertColor } from '@mui/material';
 
 export type Status = 'on' | 'off';
-export type NonInteractiveEventType = 'waitForElementToBeRemoved' | 'expect';
-export type EventType = NonInteractiveEventType | 'click' | 'hover' | 'input' | 'change';
+export type NonInteractiveEventType = 'waitForElementToBeRemoved' | 'expect' | 'not' | 'toBeInTheDocument';
+export type EventType = 'click' | 'hover' | 'input' | 'change';
 export type Framework = 'svelte' | 'react' | 'angular';
 
-export type JestQuery = 'queryByTestId' | 'queryAllByTestId' | NonInteractiveEventType;
+export type JestQuery = 'queryByTestId' | 'queryAllByTestId';
 export type JestLifeCycleFunction =
   | JestQuery
+  | NonInteractiveEventType
   | 'beforeAll'
   | 'beforeEach'
   | 'afterEach'
@@ -41,7 +42,7 @@ export type UserEventResult = {
   status: AlertColor;
   message?: string;
   target?: {
-    eventType: EventType;
+    eventType: EventType | NonInteractiveEventType;
     accessBy: JestQuery;
     element: HTMLElement | Element | null;
     accessAtIndex: number;
@@ -80,7 +81,8 @@ export type JestMemberExpression = {
   object: JestLifeCycleFunction;
   property?: string;
   arguments?: Array<Argument>;
-  chained?: JestMemberExpression; // Chaining operation like expect().toBeInTheDocument()
+  chained?: JestExpressionStatement; // Chaining operation like expect().toBeInTheDocument()
+  noParen?: boolean;
 };
 export type ImportExportKind = 'named' | 'default';
 export  type JestDeclarationExpression = {
