@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { ReactElement, useState } from 'react';
 import {
   Button,
   Chip,
@@ -7,19 +7,41 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  FormControlLabel,
+  Switch,
 } from '@mui/material';
 
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import styled from '@emotion/styled';
+
 import { EXPECT_STATEMENTS } from '../helpers';
 
 type FlagElement = { element: Element, flag: boolean };
 
-export default ({ elements, onClose }: { elements: Element[], onClose: () => void }) => {
+const Section = styled.section`
+  padding: 4px;
+  margin: 4px 0;
+  background-color: rgba(200, 200, 200, .5);
+  border-radius: 4px;
+  border-bottom: 1px solid rgba(200, 200, 200, .25);
+  text-align: center;
+`;
+
+export default ({
+  elements,
+  onClose,
+  onSubmit,
+}: {
+  elements: Element[],
+  onClose: () => void,
+  onSubmit: ({ element, not, outcome }: { element: Element | null, not: boolean, outcome: string }) => void,
+}) => {
   const [ step, setStep ] = useState<number>(1);
   const [ flagElements, setFlagElements ] = useState<FlagElement[]>(elements.map((element) => ({ element, flag: false })));
-  console.log('elements', elements);
+  const [ outcome, setOutcome ] = useState<string>('');
+  const [ not, setNot ] = useState<boolean>(false);
+
   const backOrClose = () => {
-    console.log('step', step);
     if (step === 1) {
       onClose();
       return;
@@ -34,8 +56,54 @@ export default ({ elements, onClose }: { elements: Element[], onClose: () => voi
       return;
     }
     if (step > 1) {
-      onClose();
+      onSubmit({
+        element: flagElements.find((object) => object.flag)?.element ?? null,
+        not,
+        outcome,
+      });
     }
+  };
+
+  const onToggle = () => {
+    setNot(!not);
+  };
+
+  const previewSelection = (): ReactElement | null => {
+    let jsxComponent: ReactElement | null = null;
+
+    const found = flagElements.find((object) => object.flag);
+    if (found) {
+      jsxComponent = (
+        <Section>
+          <i>expect </i>
+          <Chip sx={{
+              margin: '4px',
+            }}
+            variant={found.flag ? "filled" : "outlined"}
+            label={`${found.element.getAttribute('data-testid')}`} />
+
+          {
+            not
+              ? <i>.not</i>
+              : null
+          }
+          {
+            outcome
+              ? (
+                  <>
+                    .<Chip sx={{
+                        margin: '4px',
+                      }}
+                      variant={outcome ? "filled" : "outlined"}
+                      label={outcome} />
+                  </>
+                )
+              : null
+          }
+        </Section>
+      )
+    }
+    return jsxComponent;
   };
 
   return (
@@ -51,13 +119,14 @@ export default ({ elements, onClose }: { elements: Element[], onClose: () => voi
               : 'Choose one of the following expression outcomes for your expect statement.'
           }
         </DialogContentText>
+        {previewSelection()}
         {
           step === 1
             ? (
                 flagElements.map((object, idx) => (
                   <Chip
                     key={idx}
-                    icon={<CheckCircleIcon />}
+                    icon={object.flag ? <CheckCircleIcon /> : undefined}
                     sx={{
                       margin: '4px',
                     }}
@@ -70,21 +139,26 @@ export default ({ elements, onClose }: { elements: Element[], onClose: () => voi
                     }} />
                 ))
               )
-            : (
-                EXPECT_STATEMENTS.map((statement, idx) => (
-                  <Chip
-                    key={idx}
-                    icon={<CheckCircleIcon />}
-                    sx={{ margin: '4px' }}
-                    variant="outlined"
-                    label={statement}
-                    clickable
-                    onClick={() => {
-                      // Reset
-                      setFlagElements(elements.map((element, resetIndex) => ({ element, flag: idx === resetIndex })));
-                    }} />
-                ))
-              )
+            : <>
+                <div>
+                  <FormControlLabel control={<Switch checked={not} onChange={onToggle} />} label="Not" />
+                </div>
+                {(
+                  EXPECT_STATEMENTS.map((statement, idx) => (
+                    <Chip
+                      key={idx}
+                      icon={statement === outcome ? <CheckCircleIcon /> : undefined}
+                      sx={{ margin: '4px' }}
+                      variant={statement === outcome ? "filled" : "outlined"}
+                      label={statement}
+                      clickable
+                      onClick={() => {
+                        // Reset
+                        setOutcome(statement);
+                      }} />
+                  ))
+                )}
+              </>
         }
       </DialogContent>
       <DialogActions>

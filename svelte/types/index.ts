@@ -80,6 +80,7 @@ export type JestMemberExpression = {
   object: JestLifeCycleFunction;
   property?: string;
   arguments?: Array<Argument>;
+  chained?: JestMemberExpression; // Chaining operation like expect().toBeInTheDocument()
 };
 export type ImportExportKind = 'named' | 'default';
 export  type JestDeclarationExpression = {

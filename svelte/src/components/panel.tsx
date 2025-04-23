@@ -123,16 +123,10 @@ export default ({
 
   const resetElementSets = {
     option1() {
-      setNonInteractiveElements((elements) => {
-        elements.clear();
-        return elements;
-      });
+      setNonInteractiveElements(new Set());
     },
     option2() {
-      setPotentialElementsToExpect((elements) => {
-        elements.clear();
-        return elements;
-      });
+      setPotentialElementsToExpect(new Set());
     },
     both() {
       this.option1();
@@ -196,8 +190,10 @@ export default ({
           .filter((element) => element.getAttribute('data-testid'));
 
         if (addedElements.length === 0) return;
-
-        setPotentialElementsToExpect(new Set(addedElements.filter((element) => !nonInteractiveElements.has(element))));
+        // TODO: Doing this is not correct, it won't utilise the check for duplicate functionality here
+        addedElements.forEach((element) => {
+          setPotentialElementsToExpect((items) => items.add(element));
+        });
       });
       setObserver(mutationObserver);
       mutationObserver.observe(rootRef.current as HTMLElement, {
@@ -209,32 +205,23 @@ export default ({
     }
 
     if (status === 'off') {
-      if (potentialElementsToExpect.size === 0) return;
-      for (const value of potentialElementsToExpect.values()) {
-        console.log('value', value);
-      }
-      processResult({
-        status: 'success',
-        target: {
-          eventType: 'expect',
-          accessBy: 'queryByTestId',
-          element: [ ...potentialElementsToExpect ][potentialElementsToExpect.size - 1],
-          accessAtIndex: 0,
-        }
-      });
       observer?.disconnect();
     }
   };
 
   // Process the result (alert if error or warn and set recorded step list if successful)
-  const processResult = (result: UserEventResult | null) => {
+  const processResult = (result: UserEventResult | null, extraInfo?: {}) => {
     if (result?.status === 'error' || result?.status === 'warning') {
       setAlert((prev) => [ ...prev, { message: result?.message as string, style: result?.status } ]);
       return;
     }
     if (result?.status === 'success') {
       // Use User interaction to Jest code mapper here
-      const recordedStep = Jest[result.target?.eventType as EventType](result.target, (result.target?.element as HTMLInputElement)?.value ?? '');
+      const recordedStep = Jest[result.target?.eventType as EventType]({
+        userEvent: result.target,
+        value: (result.target?.element as HTMLInputElement)?.value ?? '',
+        extraInfo,
+      });
       setSteps((items) => [ ...items, recordedStep ]);
       // Check for imports or declaration
       const declarationStatements = Jest.createDeclaration(result.target?.accessBy as JestQuery, componentRef.current.props);
@@ -388,7 +375,27 @@ export default ({
       {/* Modal */}
       {
         recordState === 'off' && potentialElementsToExpect.size > 0
-          ? <Modal elements={Array.from(potentialElementsToExpect)} onClose={() => { resetElementSets.option2(); }} />
+          ? <Modal
+              elements={Array.from(potentialElementsToExpect)}
+              onClose={() => { resetElementSets.option2(); }}
+              onSubmit={({ element, not, outcome }: { element: Element | null, not: boolean, outcome: string }) => {
+                if (potentialElementsToExpect.size === 0) return;
+                processResult(
+                  {
+                    status: 'success',
+                    target: {
+                      eventType: 'expect',
+                      accessBy: 'queryByTestId',
+                      element,
+                      accessAtIndex: 0,
+                    }
+                  },
+                  {
+                    not,
+                    outcome,
+                  },
+                );
+              }} />
           : null
       }
 

@@ -43,7 +43,7 @@ export default class Jest {
     }
     return '';
   }
-  public static click(userEvent: UserEventResult['target']): JestExpressionStatement {
+  public static click({ userEvent }: { userEvent: UserEventResult['target'] }): JestExpressionStatement {
     return {
       keyword: 'await',
       callee: {
@@ -59,7 +59,7 @@ export default class Jest {
       },
     };
   };
-  public static input(userEvent: UserEventResult['target'], value: string): JestExpressionStatement {
+  public static input({ userEvent, value }: { userEvent: UserEventResult['target'], value: string }): JestExpressionStatement {
     return {
       keyword: 'await',
       callee: {
@@ -76,7 +76,7 @@ export default class Jest {
       },
     };
   };
-  public static change(userEvent: UserEventResult['target'], value: string): JestExpressionStatement {
+  public static change({ userEvent, value }: { userEvent: UserEventResult['target'], value: string }): JestExpressionStatement {
     return {
       keyword: 'await',
       callee: {
@@ -105,7 +105,7 @@ export default class Jest {
       },
     };
   };
-  public static hover(userEvent: UserEventResult['target']): JestExpressionStatement {
+  public static hover({ userEvent }: { userEvent: UserEventResult['target'] }): JestExpressionStatement {
     return {
       keyword: 'await',
       callee: {
@@ -121,7 +121,7 @@ export default class Jest {
       },
     };
   }
-  public static waitForElementToBeRemoved(userEvent: UserEventResult['target']): JestExpressionStatement {
+  public static waitForElementToBeRemoved({ userEvent }: { userEvent: UserEventResult['target'] }): JestExpressionStatement {
     return {
       keyword: 'await',
       callee: {
@@ -136,7 +136,7 @@ export default class Jest {
       }
     }
   }
-  public static expect(userEvent: UserEventResult['target']): JestExpressionStatement {
+  public static expect({ userEvent, extraInfo }: { userEvent: UserEventResult['target'], extraInfo?: {} }): JestExpressionStatement {
     return {
       callee: {
         object: 'expect',
