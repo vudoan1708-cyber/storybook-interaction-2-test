@@ -1,3 +1,5 @@
+import { ExpectStatement } from "../../types";
+
 export const ADDON_ID = 'storybook/interaction-2-test';
 export const PANEL_ID = `${ADDON_ID}/panel`;
 
@@ -15,14 +17,14 @@ export const FRAMEWORK_TO_LOGO = {
 
 export const LOCAL_STORAGE_KEY = 'storybook/interaction-2-test/settings';
 
-export const EXPECT_STATEMENTS = [
-  'toBeInTheDocument',
-  'toBeNull',
-  'toBeUndefined',
-  'toBe',
-  'toHaveTextContent',
-  'toHaveStyle',
-  'toHaveLength',
-  'toEqual',
-  'toStrictEqual',
+export const EXPECT_STATEMENTS: Array<ExpectStatement> = [
+  { keyword: 'toBeInTheDocument', argumentTypes: [] },
+  { keyword: 'toBeNull', argumentTypes: [] },
+  { keyword: 'toBeUndefined', argumentTypes: [] },
+  { keyword: 'toBe', argumentTypes: [ 'any' ] },
+  { keyword: 'toHaveTextContent', argumentTypes: [ 'string' ] },
+  { keyword: 'toHaveStyle', argumentTypes: [ 'object | string' ] },
+  { keyword: 'toHaveLength', argumentTypes: [ 'number' ] },
+  { keyword: 'toEqual', argumentTypes: [ 'any' ] },
+  { keyword: 'toStrictEqual', argumentTypes: [ 'any' ] },
 ];

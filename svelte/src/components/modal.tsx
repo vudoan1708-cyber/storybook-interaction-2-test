@@ -9,12 +9,14 @@ import {
   DialogTitle,
   FormControlLabel,
   Switch,
+  TextareaAutosize,
 } from '@mui/material';
 
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import styled from '@emotion/styled';
 
 import { EXPECT_STATEMENTS } from '../helpers';
+import { ExpectStatement } from '../../types';
 
 type FlagElement = { element: Element, flag: boolean };
 
@@ -34,11 +36,11 @@ export default ({
 }: {
   elements: Element[],
   onClose: () => void,
-  onSubmit: ({ element, negation, outcome }: { element: Element | null, negation: string, outcome: string }) => void,
+  onSubmit: ({ element, negation, outcome }: { element: Element | null, negation: string, outcome: ExpectStatement }) => void,
 }) => {
   const [ step, setStep ] = useState<number>(1);
   const [ flagElements, setFlagElements ] = useState<FlagElement[]>(elements.map((element) => ({ element, flag: false })));
-  const [ outcome, setOutcome ] = useState<string>('');
+  const [ outcome, setOutcome ] = useState<ExpectStatement>();
   const [ not, setNot ] = useState<boolean>(false);
 
   const backOrClose = () => {
@@ -59,7 +61,7 @@ export default ({
       onSubmit({
         element: flagElements.find((object) => object.flag)?.element ?? null,
         negation: not ? 'not' : '',
-        outcome,
+        outcome: outcome as ExpectStatement,
       });
     }
   };
@@ -94,8 +96,8 @@ export default ({
                     .<Chip sx={{
                         margin: '4px',
                       }}
-                      variant={outcome ? "filled" : "outlined"}
-                      label={outcome} />
+                      variant={outcome.keyword ? "filled" : "outlined"}
+                      label={outcome.keyword} />
                   </>
                 )
               : null
@@ -147,10 +149,10 @@ export default ({
                   EXPECT_STATEMENTS.map((statement, idx) => (
                     <Chip
                       key={idx}
-                      icon={statement === outcome ? <CheckCircleIcon /> : undefined}
+                      icon={statement.keyword === outcome?.keyword ? <CheckCircleIcon /> : undefined}
                       sx={{ margin: '4px' }}
-                      variant={statement === outcome ? "filled" : "outlined"}
-                      label={statement}
+                      variant={statement.keyword === outcome?.keyword ? "filled" : "outlined"}
+                      label={statement.keyword}
                       clickable
                       onClick={() => {
                         // Reset
@@ -158,6 +160,23 @@ export default ({
                       }} />
                   ))
                 )}
+
+                {
+                  (outcome?.argumentTypes ?? []).length > 0
+                    ? (
+                      <TextareaAutosize
+                        maxRows={4}
+                        aria-label="argument"
+                        placeholder="Argument"
+                        style={{ width: '100%', resize: 'vertical' }}
+                        onChange={(e) => {
+                          e.persist();
+                          setOutcome((current) => ({ ...current, arguments: [ e.target.value ] } as ExpectStatement))
+                        }}
+                      />
+                      )
+                    : null
+                }
               </>
         }
       </DialogContent>

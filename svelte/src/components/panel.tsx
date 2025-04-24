@@ -27,6 +27,7 @@ import Modal from './modal';
 import {
   Actors,
   EventType,
+  ExpectStatement,
   Framework,
   JestDeclarationExpression,
   JestExpressionStatement,
@@ -380,7 +381,7 @@ export default ({
           ? <Modal
               elements={Array.from(potentialElementsToExpect)}
               onClose={() => { resetElementSets.option2(); }}
-              onSubmit={({ element, negation, outcome }: { element: Element | null, negation: string, outcome: string }) => {
+              onSubmit={({ element, negation, outcome }: { element: Element | null, negation: string, outcome: ExpectStatement }) => {
                 if (potentialElementsToExpect.size === 0) return;
                 processResult(
                   {

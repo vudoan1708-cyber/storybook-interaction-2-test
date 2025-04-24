@@ -118,6 +118,8 @@ export type DeclarationTemplate = {
   };
 };
 
+export type ExpectStatement = { keyword: string; argumentTypes: Array<any>; arguments?: Array<any> };
+
 // Settings
 export type RecordingSettings = {
   status: Status;

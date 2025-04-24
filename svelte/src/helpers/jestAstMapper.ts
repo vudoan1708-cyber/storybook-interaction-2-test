@@ -2,6 +2,7 @@
 import DeclarationMapper from './declarationAstMapper';
 import {
   Argument,
+  ExpectStatement,
   Framework,
   JestExpressionStatement,
   JestLifeCycleFunction,
@@ -137,13 +138,31 @@ export default class Jest {
       }
     }
   }
-  public static expect({ userEvent, chainingOperations }: { userEvent: UserEventResult['target'], chainingOperations: Record<string, any> }): JestExpressionStatement {
+  public static expect({
+    userEvent,
+    chainingOperations,
+  }: {
+    userEvent: UserEventResult['target'],
+    chainingOperations: Record<string, string | ExpectStatement>,
+  }): JestExpressionStatement {
     const values = Object.values(chainingOperations).filter((value) => value);
-    const createChainingOperations = (values: Array<string>, idx: number): JestExpressionStatement => {
+    const createChainingOperations = (values: Array<string | ExpectStatement>, idx: number): JestExpressionStatement => {
+      const processValue = (value: string | ExpectStatement) => {
+        if (typeof value === 'object') {
+          return value.keyword;
+        }
+        return value;
+      };
+      const processArgs = (value: string | ExpectStatement) => {
+        if (typeof value === 'object') {
+          return value.arguments;
+        }
+        return [];
+      };
       return {
         callee: {
-          object: values[idx] as JestLifeCycleFunction,
-          arguments: [],
+          object: processValue(values[idx]) as JestLifeCycleFunction,
+          arguments: processArgs(values[idx]),
           chained: idx === values.length - 1 ? undefined : createChainingOperations(values, idx + 1),
           noParen: values[idx] === 'not',
         }
