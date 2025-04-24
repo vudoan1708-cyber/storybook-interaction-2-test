@@ -1,1 +1,84 @@
-{}
+{
+  "name": "interaction-2-test",
+  "version": "1.0.0",
+  "description": "A storybook addon that generates unit test (Jest for now) based on user interaction on the Storybook component UI",
+  "main": "./dist/preset.js",
+  "sideEffects": true,
+  "scripts": {
+    "ts:init": "tsc --init",
+    "check": "tsc --noEmit",
+    "dev": "node ./esbuild.config.js",
+    "build": "node ./esbuild.config.js --bundle",
+    "release": "auto shipit"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": "./dist/manager.js",
+    "./preset": "./dist/preset.js"
+  },
+  "files": [
+    "package.json",
+    "package-lock.json",
+    "./dist",
+    "CHANGELOG.md",
+    "README.md"
+  ],
+  "keywords": [
+    "storybook-addons"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vudoan1708-cyber/storybook-interaction-2-test"
+  },
+  "author": "",
+  "license": "ISC",
+  "peerDependencies": {
+    "@storybook/addons": "^6.5.16",
+    "@storybook/components": "^6.5.16",
+    "svelte": "^3.49.0"
+  },
+  "dependencies": {
+    "@babel/generator": "^7.27.0",
+    "@babel/parser": "^7.27.0",
+    "@babel/traverse": "^7.27.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^7.0.2",
+    "@mui/material": "^7.0.2",
+    "@storybook/addons": "^6.5.16",
+    "@storybook/components": "^6.5.16",
+    "@storybook/core-events": "^8.6.12",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "ws": "^8.18.1"
+  },
+  "devDependencies": {
+    "@auto-it/npm": "^11.3.0",
+    "@types/babel__generator": "^7.27.0",
+    "@types/babel__traverse": "^7.20.7",
+    "@types/react": "^19.1.1",
+    "@types/ws": "^8.18.1",
+    "auto": "^11.3.0",
+    "babel-loader": "^10.0.0",
+    "esbuild": "^0.25.2",
+    "typescript": "^5.8.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "bundler": {
+    "managerEntries": [
+      "src/manager.tsx"
+    ],
+    "nodeEntries": [
+      "src/preset.ts"
+    ]
+  },
+  "storybook": {
+    "displayName": "Interaction 2 Test",
+    "unsupportedFrameworks": [
+      "react-native"
+    ],
+    "icon": "https://vudoan1708-cyber.github.io/logos/interaction-to-jest-test-programming-high-resolution-logo.png"
+  }
+}
