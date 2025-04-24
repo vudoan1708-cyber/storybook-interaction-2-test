@@ -18,7 +18,11 @@ export const LOCAL_STORAGE_KEY = 'storybook/interaction-2-test/settings';
 export const EXPECT_STATEMENTS = [
   'toBeInTheDocument',
   'toBeNull',
+  'toBeUndefined',
+  'toBe',
   'toHaveTextContent',
   'toHaveStyle',
   'toHaveLength',
+  'toEqual',
+  'toStrictEqual',
 ];

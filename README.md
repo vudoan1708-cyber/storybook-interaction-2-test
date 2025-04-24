@@ -12,6 +12,10 @@ This is a storybook addon that generates unit test (Jest for now) based on user 
 Add this to the `main.js` addons array and it should work straight away.
 
 ## Known Issues
+Expect statement is weak at guessing user intents, and hence is not very reliable at the moment.
+
+## Dev Notes
+When `npm install` the local path to the addon, this creates a symlink that can automatically updates the addon from the storybook project side. However, as soon as, the instance of your IDE is closed (for whatever reason), you will need to delete `package.json` as well as `node_modules`, and reinstall the addon again so it won't cache.
 
 ## Release Notes
 
@@ -19,3 +23,4 @@ Add this to the `main.js` addons array and it should work straight away.
 [Svelte Logo](https://en.m.wikipedia.org/wiki/File:Svelte_Logo.svg)
 
 ### 1.0.0
+Expect statement is weak at guessing user intents, and hence is not very reliable at the moment.

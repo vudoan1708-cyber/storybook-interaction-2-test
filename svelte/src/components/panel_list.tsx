@@ -35,6 +35,16 @@ export default ({
     overflow-y: auto;
   `;
 
+  const scrollRef = useRef<HTMLOListElement>(null);
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el) {
+      el.scrollTo({
+        top: el.scrollHeight,
+      });
+    }
+  }, [ actionList, importList, variableList ]);
+
   useEffect(() => {
     footerRef.current = document.querySelector('footer');
     headerRef.current = document.querySelector('#i2t-header');
@@ -44,7 +54,7 @@ export default ({
   }, [ importList, variableList, actionList ]);
 
   return (
-    <OlStyle footerHeight={footerRef.current?.offsetHeight ?? 0} headerHeight={headerRef.current?.offsetHeight ?? 0}>
+    <OlStyle ref={scrollRef} footerHeight={footerRef.current?.offsetHeight ?? 0} headerHeight={headerRef.current?.offsetHeight ?? 0}>
       {importList.length > 0
         ? (
             importList?.map((item, idx) => (

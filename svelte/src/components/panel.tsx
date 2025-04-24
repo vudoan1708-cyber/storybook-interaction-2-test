@@ -194,6 +194,7 @@ export default ({
 
         if (addedElements.length === 0) return;
         addedElements.forEach((element) => {
+          if (potentialElementsToExpect.has(element)) return;
           setPotentialElementsToExpect((items) => items.add(element));
         });
       });
