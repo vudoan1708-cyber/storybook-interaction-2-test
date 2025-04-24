@@ -58,4 +58,5 @@ What we can do is define our own “actors and scenes” from Storybook paramete
 ## [24/04/2025]
 - Scroll to the bottom every time a new Jest code has been added so that the UI doesn't jump.
 - Textarea input for specific `expect` outcomes.
+- Render the `expect`ed outcome to the code UI.
 <br />

@@ -1,5 +1,6 @@
 import React, { ReactElement, useState } from 'react';
 import {
+  Box,
   Button,
   Chip,
   Dialog,
@@ -78,7 +79,8 @@ export default ({
       jsxComponent = (
         <Section>
           <i>expect </i>
-          <Chip sx={{
+          <Chip
+            sx={{
               margin: '4px',
             }}
             variant={found.flag ? "filled" : "outlined"}
@@ -93,11 +95,39 @@ export default ({
             outcome
               ? (
                   <>
-                    .<Chip sx={{
-                        margin: '4px',
-                      }}
-                      variant={outcome.keyword ? "filled" : "outlined"}
-                      label={outcome.keyword} />
+                    .<Chip
+                        sx={{
+                          margin: '4px',
+                          maxWidth: '100%',
+                        }}
+                        variant="filled"
+                        label={
+                          <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+                            {outcome.keyword}
+                            {
+                              (outcome?.arguments ?? []).length > 0
+                                ? (
+                                    <Box
+                                      sx={{
+                                        ml: 1,
+                                        px: 1,
+                                        py: 0.5,
+                                        bgcolor: 'rgba(0, 0, 0, 0.25)',
+                                        color: 'white',
+                                        borderRadius: '16px',
+                                        fontSize: '0.75rem',
+                                        lineHeight: 1,
+                                        whiteSpace: 'nowrap',
+                                        minWidth: 24,
+                                        textAlign: 'center',
+                                      }}>
+                                      {outcome.arguments}
+                                    </Box>
+                                  )
+                                : null
+                            }
+                          </span>
+                        } />
                   </>
                 )
               : null
@@ -156,7 +186,7 @@ export default ({
                       clickable
                       onClick={() => {
                         // Reset
-                        setOutcome(statement);
+                        setOutcome({ ...statement, arguments: [] });
                       }} />
                   ))
                 )}
@@ -168,12 +198,12 @@ export default ({
                         maxRows={4}
                         aria-label="argument"
                         placeholder="Argument"
-                        style={{ width: '100%', resize: 'vertical' }}
+                        style={{ width: '100%', resize: 'vertical', marginTop: '12px' }}
+                        value={outcome?.arguments?.[0] ?? ''}
                         onChange={(e) => {
                           e.persist();
                           setOutcome((current) => ({ ...current, arguments: [ e.target.value ] } as ExpectStatement))
-                        }}
-                      />
+                        }} />
                       )
                     : null
                 }
@@ -184,7 +214,12 @@ export default ({
         <Button onClick={backOrClose}>
           {step === 1 ? 'Cancel' : 'Back'}
         </Button>
-        <Button type="submit" disabled={flagElements.every((object) => !object.flag)} onClick={increment}>Select</Button>
+        <Button
+          type="submit"
+          disabled={step === 1 ? flagElements.every((object) => !object.flag) : !outcome?.keyword}
+          onClick={increment}>
+          Select
+        </Button>
       </DialogActions>
     </Dialog>
   )
