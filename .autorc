@@ -1,11 +1,3 @@
 {
-  "plugins": [
-    [
-      "npm",
-      {
-        "npmPublish": true,
-        "options": ["--allow-same-version"]
-      }
-    ]
-  ]
+  "plugins": []
 }
