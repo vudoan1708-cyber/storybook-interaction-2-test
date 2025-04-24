@@ -202,7 +202,7 @@ export default ({
                         value={outcome?.arguments?.[0] ?? ''}
                         onChange={(e) => {
                           e.persist();
-                          setOutcome((current) => ({ ...current, arguments: [ e.target.value ] } as ExpectStatement))
+                          setOutcome((current) => ({ ...current, arguments: [ e.target.value ].filter(Boolean) } as ExpectStatement))
                         }} />
                       )
                     : null
