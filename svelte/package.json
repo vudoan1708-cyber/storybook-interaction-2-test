@@ -1,7 +1,7 @@
 {
   "name": "interaction-2-test",
   "version": "1.0.0",
-  "description": "",
+  "description": "A storybook addon that generates unit test (Jest for now) based on user interaction on the Storybook component UI (Svelte version)",
   "main": "./dist/preset.js",
   "sideEffects": true,
   "scripts": {
@@ -23,7 +23,13 @@
     "./dist",
     "CHANGELOG.md"
   ],
-  "keywords": [],
+  "keywords": [
+     "storybook-addons"
+   ],
+   "repository": {
+     "type": "git",
+     "url": "https://github.com/vudoan1708-cyber/storybook-interaction-2-test/tree/master/svelte"
+   },
   "author": "",
   "license": "ISC",
   "peerDependencies": {
@@ -55,10 +61,22 @@
     "esbuild": "^0.25.2",
     "typescript": "^5.8.3"
   },
-  "storybook": {
-    "displayName": "Interaction 2 Test",
-    "unsupportedFrameworks": [
-      "react-native"
-    ]
-  }
+  "publishConfig": {
+     "access": "public"
+   },
+   "bundler": {
+     "managerEntries": [
+       "src/manager.tsx"
+     ],
+     "nodeEntries": [
+       "src/preset.ts"
+     ]
+   },
+   "storybook": {
+     "displayName": "Interaction 2 Test",
+     "unsupportedFrameworks": [
+       "react-native"
+     ],
+     "icon": "https://vudoan1708-cyber.github.io/logos/interaction-to-jest-test-programming-high-resolution-logo.png"
+   }
 }

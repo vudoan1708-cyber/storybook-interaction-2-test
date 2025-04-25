@@ -8,7 +8,7 @@ export type Framework = 'svelte' | 'react' | 'angular';
 export type JestQuery = 'queryByTestId' | 'queryAllByTestId';
 export type JestLifeCycleFunction =
   | JestQuery
-  | NonInteractiveEventType
+  | Exclude<NonInteractiveEventType, 'expect' | 'not' | 'toBeInTheDocument'>
   | 'beforeAll'
   | 'beforeEach'
   | 'afterEach'
