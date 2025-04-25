@@ -8,7 +8,8 @@ try {
   execSync(`git tag ${tagName}`, { stdio: 'inherit' });
 
   // Push the tag
-  execSync(`git push origin ${tagName}`, { stdio: 'inherit' });
+  execSync('git push', { stdio: 'inherit' });
+  execSync('git push --tags', { stdio: 'inherit' });
 
   // Release
   execSync(`auto shipit --use-version ${tagName}`, { stdio: 'inherit' });
