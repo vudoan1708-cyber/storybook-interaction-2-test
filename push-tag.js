@@ -10,6 +10,9 @@ try {
   // Push the tag
   execSync(`git push origin ${tagName}`, { stdio: 'inherit' });
 
+  // Release
+  execSync(`auto shipit --use-version ${tagName}`, { stdio: 'inherit' });
+
   console.log(`✅ Pushed tag ${tagName} to origin`);
 } catch (err) {
   console.error(`❌ Failed to push tag ${tagName}:`, err.message);
