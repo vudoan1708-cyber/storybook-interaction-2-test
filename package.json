@@ -9,7 +9,7 @@
     "check": "tsc --noEmit",
     "dev": "node ./esbuild.config.js",
     "build": "node ./esbuild.config.js --bundle",
-    "release": "auto shipit"
+    "release": "npm version minor --no-git-tag-version -m \"chore(release): bump to %s\" && git add package*.json && git commit -m \"chore(release): bump to $(node -p 'require(\"./package.json\").version')\" && node push-tag.js"
   },
   "exports": {
     "./package.json": "./package.json",
@@ -17,11 +17,11 @@
     "./preset": "./dist/preset.js"
   },
   "files": [
-    "package.json",
-    "package-lock.json",
-    "./dist",
-    "CHANGELOG.md",
-    "README.md"
+    "package*.json",
+    "dist/**/*",
+    "*.js",
+    "README.md",
+    "CHANGELOG.md"
   ],
   "keywords": [
     "storybook-addons"
