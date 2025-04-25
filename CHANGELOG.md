@@ -1,4 +1,4 @@
-# v0.0.1 (Fri Apr 25 2025)
+# v1.0.0 (Fri Apr 25 2025)
 
 #### ⚠️ Pushed to `master`
 
