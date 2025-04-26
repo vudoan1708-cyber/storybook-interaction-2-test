@@ -22,6 +22,14 @@ When `npm install` the local path to the addon, this creates a symlink that can 
 ## References
 [Svelte Logo](https://en.m.wikipedia.org/wiki/File:Svelte_Logo.svg)
 
+## Installation
+
+Use as a dev dependency:
+
+```sh
+npm i -D interaction-2-test
+```
+
 ### 1.1.0
 - Expect statement is weak at guessing user intents, and hence is not very reliable at the moment.
 ### 1.2.0
