@@ -1,4 +1,4 @@
-import { APICallRecord, ExpectStatement } from "../../types";
+import type { APICallRecord, ExpectStatement } from "../../types";
 
 export const ADDON_NAME = 'interaction-2-test';
 

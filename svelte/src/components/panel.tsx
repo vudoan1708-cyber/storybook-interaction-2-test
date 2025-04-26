@@ -11,12 +11,10 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Chip from '@mui/material/Chip';
 
-import {
-  RadioButtonChecked as RadioButtonCheckedIcon,
-  Stop as StopIcon,
-  FeaturedPlayList as FeaturedPlayListIcon,
-  SettingsSuggest as SettingsSuggestIcon,
-} from '@mui/icons-material';
+import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
+import StopIcon from '@mui/icons-material/Stop';
+import FeaturedPlayListIcon from '@mui/icons-material/FeaturedPlayList';
+import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
 
 import styled from '@emotion/styled';
 
@@ -24,7 +22,7 @@ import PanelList from './panel_list';
 import Modal from './modal';
 
 // Type
-import {
+import type {
   Actors,
   APICallRecord,
   EventType,

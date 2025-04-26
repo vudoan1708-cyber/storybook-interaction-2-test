@@ -2,6 +2,7 @@
   "name": "interaction-2-test",
   "version": "1.3.0",
   "description": "A storybook addon that generates unit test (Jest for now) based on user interaction on the Storybook component UI",
+  "author": "Vu Doan",
   "main": "./preset.js",
   "sideEffects": true,
   "scripts": {
@@ -9,18 +10,17 @@
     "check": "tsc --noEmit",
     "dev": "node ./esbuild.config.js",
     "build": "node ./esbuild.config.js --bundle",
-    "release": "npm version minor --no-git-tag-version -m \"chore(release): bump to %s\" && git add package*.json && git commit -m \"chore(release): bump to $(node -p 'require(\"./package.json\").version')\" && node push-tag.js"
+    "release": "npm version patch --no-git-tag-version -m \"chore(release): bump to %s\" && git add package*.json && git commit -m \"chore(release): bump to $(node -p 'require(\"./package.json\").version')\" && node push-tag.js"
   },
   "exports": {
     "./package.json": "./package.json",
     ".": "./dist/manager.js",
-    "./preset": "./dist/preset.js",
-    "./preview": "./dist/preview.js"
+    "./preset": "./dist/preset.js"
   },
   "files": [
     "package*.json",
     "dist/**/*",
-    "*.js",
+    "preset.js",
     "README.md",
     "CHANGELOG.md"
   ],
@@ -31,12 +31,20 @@
     "type": "git",
     "url": "https://github.com/vudoan1708-cyber/storybook-interaction-2-test"
   },
-  "author": "",
   "license": "MIT",
   "peerDependencies": {
     "@storybook/addons": "^6.5.16",
     "@storybook/components": "^6.5.16",
+    "@storybook/core-events": "^8.6.12",
+    "storybook": "^6.5.16",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
     "svelte": "^3.49.0"
+  },
+  "peerDependenciesMeta": {
+    "svelte": {
+      "optional": true
+    }
   },
   "dependencies": {
     "@babel/generator": "^7.27.0",
@@ -48,9 +56,6 @@
     "@mui/material": "^7.0.2",
     "@storybook/addons": "^6.5.16",
     "@storybook/components": "^6.5.16",
-    "@storybook/core-events": "^8.6.12",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
     "ws": "^8.18.1"
   },
   "devDependencies": {

@@ -1,4 +1,4 @@
-import { Actors, EventType, NonInteractiveEventType, UserEventResult } from "../../types";
+import type { Actors, EventType, NonInteractiveEventType, UserEventResult } from '../../types';
 
 const __checkIfMany = (
   root: HTMLElement,

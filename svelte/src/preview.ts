@@ -1,6 +1,6 @@
 import { API_CALL_EVENT_NAME, debounce } from './helpers';
 
-import { APICallRecord } from '../types';
+import type { APICallRecord } from '../types';
 
 const windowPostMessageDebounced = debounce(() => {
   window.parent.postMessage(
@@ -12,7 +12,10 @@ const windowPostMessageDebounced = debounce(() => {
   );
 }, 150);
 
-requestAnimationFrame(() => {
+const patchedFetch = () => {
+  if (window.__fetchPatched || typeof window.fetch !== 'function') return;
+  window.__fetchPatched = true;
+
   const originalFetch = window.fetch;
 
   window.__apiCallRecord = {} as APICallRecord;
@@ -39,4 +42,10 @@ requestAnimationFrame(() => {
 
     return cloned;
   };
+};
+
+requestAnimationFrame(() => {
+  patchedFetch();
 });
+
+export const parameters = {};

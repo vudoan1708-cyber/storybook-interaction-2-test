@@ -8,7 +8,7 @@ import InteractionPanel from './panel';
 // Helper
 import { DEFINE_ACTORS, WS_PORT } from '../helpers/constants';
 // Type
-import { Actors, Framework, ObjectExpression } from '../../types';
+import type { Actors, Framework, ObjectExpression } from '../../types';
 
 // WebSocket client
 const ws = new WebSocket(`ws://localhost:${WS_PORT}`);

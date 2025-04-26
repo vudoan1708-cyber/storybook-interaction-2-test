@@ -5,12 +5,10 @@ import { parse as babelParser } from '@babel/parser';
 import traverse from '@babel/traverse';
 import generate from '@babel/generator';
 
-import { ObjectExpression } from '../../types';
-import { DEFINE_ACTORS } from './constants';
+import type { ObjectExpression } from '../../types';
 
 export const getFileContent = (filePath: string) => {
   if (!fs.existsSync(filePath))  return null;
-
   return fs.readFileSync(filePath, 'utf-8')?.toString();
 };
 

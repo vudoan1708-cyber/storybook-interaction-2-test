@@ -2,6 +2,7 @@
   "name": "interaction-2-test",
   "version": "1.0.0",
   "description": "A storybook addon that generates unit test (Jest for now) based on user interaction on the Storybook component UI (Svelte version)",
+  "author": "Vu Doan",
   "main": "./dist/preset.js",
   "sideEffects": true,
   "scripts": {
@@ -31,7 +32,6 @@
      "type": "git",
      "url": "https://github.com/vudoan1708-cyber/storybook-interaction-2-test/tree/master/svelte"
    },
-  "author": "",
   "license": "MIT",
   "peerDependencies": {
     "@storybook/addons": "^6.5.16",

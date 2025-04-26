@@ -1,5 +1,5 @@
 /* This needs to be a class so we could use a factory to determine test technology (Jest, Enzyme, Mocha,...) based on instantiation */
-import {
+import type {
   DeclarationTemplate,
   Framework,
   JestDeclarationExpression,

@@ -37,3 +37,7 @@ export const managerEntries = (entry = []) => {
   console.log(`[${ADDON_NAME}] 📦 managerEntries loaded`);
   return [ ...entry, require.resolve(path.resolve(__dirname, 'manager.js')) ];
 };
+export const previewEntries = (entry = []) => {
+  console.log(`[${ADDON_NAME}] 📦 previewEntries loaded`);
+  return [ ...entry, require.resolve(path.resolve(__dirname, 'preview.js')) ];
+};

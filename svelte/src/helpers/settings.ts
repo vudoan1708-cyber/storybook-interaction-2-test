@@ -1,5 +1,5 @@
 import { ADDON_NAME, LOCAL_STORAGE_KEY } from '.';
-import { RecordingSettings } from '../../types';
+import type { RecordingSettings } from '../../types';
 
 export const getFromLocalStorage = (): RecordingSettings | null => {
   const stored = localStorage.getItem(LOCAL_STORAGE_KEY);

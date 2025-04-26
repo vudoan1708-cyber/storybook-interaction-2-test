@@ -1,25 +1,24 @@
-import React, { ReactElement, useEffect, useRef, useState } from 'react';
-import {
-  Box,
-  Button,
-  Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  FormControlLabel,
-  Stack,
-  Switch,
-  TextareaAutosize,
-  Typography,
-} from '@mui/material';
+import React, { ReactElement, useRef, useState } from 'react';
+
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Chip from '@mui/material/Chip';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Stack from '@mui/material/Stack';
+import Switch from '@mui/material/Switch';
+import TextareaAutosize from '@mui/material/TextareaAutosize';
+import Typography from '@mui/material/Typography';
 
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import styled from '@emotion/styled';
 
 import { EXPECT_OUTCOME_API_CALL_MAPPER, EXPECT_STATEMENTS } from '../helpers';
-import { APICallRecord, ExpectStatement } from '../../types';
+import type { APICallRecord, ExpectStatement } from '../../types';
 
 type FlagElement = { element: Element, flag: boolean };
 
