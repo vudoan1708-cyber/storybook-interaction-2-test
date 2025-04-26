@@ -31,7 +31,7 @@ function buildBrowser() {
     ...sharedOptions,
     entryPoints: [
       'src/manager.tsx',
-      // 'src/preview.ts'
+      'src/preview.ts',
     ],
     outdir: 'dist',
     platform: 'browser',

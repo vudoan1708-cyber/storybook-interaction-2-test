@@ -8,7 +8,7 @@ export type Framework = 'svelte' | 'react' | 'angular';
 export type JestQuery = 'queryByTestId' | 'queryAllByTestId';
 export type JestLifeCycleFunction =
   | JestQuery
-  | Exclude<NonInteractiveEventType, 'expect' | 'not' | 'toBeInTheDocument'>
+  | Exclude<NonInteractiveEventType, 'not' | 'toBeInTheDocument'>
   | 'beforeAll'
   | 'beforeEach'
   | 'afterEach'
@@ -43,8 +43,8 @@ export type UserEventResult = {
   message?: string;
   target?: {
     eventType: EventType | NonInteractiveEventType;
-    accessBy: JestQuery;
-    element: HTMLElement | Element | null;
+    accessBy?: JestQuery;
+    element: HTMLElement | Element | string | null;
     accessAtIndex: number;
   };
 };
@@ -119,6 +119,17 @@ export type DeclarationTemplate = {
 };
 
 export type ExpectStatement = { keyword: string; argumentTypes: Array<any>; arguments?: Array<any> };
+
+// API
+export type APICallRecord = {
+  [url: string]: {
+    method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+    requestBody: BodyInit | null | undefined;
+    responseBody: any;
+    times: number;
+    status: number;
+  };
+};
 
 // Settings
 export type RecordingSettings = {

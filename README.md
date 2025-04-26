@@ -8,7 +8,7 @@ This is a storybook addon that generates unit test (Jest for now) based on user 
 <br /><sup></sup>
 
 ## Extension Settings
-
+Storybook version 6+, any major version bump from version 6 will not work with this addon.
 Add this to the `main.js` addons array and it should work straight away.
 
 ## Known Issues
@@ -22,5 +22,7 @@ When `npm install` the local path to the addon, this creates a symlink that can 
 ## References
 [Svelte Logo](https://en.m.wikipedia.org/wiki/File:Svelte_Logo.svg)
 
-### 1.0.0
-Expect statement is weak at guessing user intents, and hence is not very reliable at the moment.
+### 1.1.0
+- Expect statement is weak at guessing user intents, and hence is not very reliable at the moment.
+### 1.2.0
+- Monkey patched `fetch` to collate API calls and make the `expect` stage more powerful at predicting expected outcome.

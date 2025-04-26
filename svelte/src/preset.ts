@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { WebSocketServer } from 'ws';
 
-import { WS_PORT } from './helpers/constants';
+import { ADDON_NAME, WS_PORT } from './helpers/constants';
 
 // Helper functions
 import { getFileContent, analyseCode } from './helpers/preset_fileParser';
@@ -10,7 +10,7 @@ import { getFileContent, analyseCode } from './helpers/preset_fileParser';
 const wss = new WebSocketServer({ port: WS_PORT });
 
 wss.on('connection', (ws) => {
-  console.log('[interaction-2-test] ✅ WebSocket client connected');
+  console.log(`[${ADDON_NAME}] ✅ WebSocket client connected`);
    
   ws.on('message', (message: any) => {
     const response = JSON.parse(message.toString());
@@ -34,7 +34,10 @@ wss.on('connection', (ws) => {
 });
 
 export const managerEntries = (entry = []) => {
-  console.log('[interaction-2-test] 📦 managerEntries loaded');
-  console.log('[interaction-2-test] path', path.resolve(__dirname, 'manager.js'));
+  console.log(`[${ADDON_NAME}] 📦 managerEntries loaded`);
   return [ ...entry, require.resolve(path.resolve(__dirname, 'manager.js')) ];
+};
+export const previewAnnotations = (entry = []) => {
+  console.log(`[${ADDON_NAME}] 📦 previewAnnotations loaded`);
+  return [ ...entry, require.resolve(path.resolve(__dirname, 'preview.js')) ];
 };

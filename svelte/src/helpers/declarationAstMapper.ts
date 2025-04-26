@@ -24,6 +24,7 @@ export default class DeclarationMapper {
       beforeEach: { kind: 'importDeclaration', from: '@jest/global', declarationSyntax: 'named' },
       afterAll: { kind: 'importDeclaration', from: '@jest/global', declarationSyntax: 'named' },
       afterEach: { kind: 'importDeclaration', from: '@jest/global', declarationSyntax: 'named' },
+      expect: { kind: 'importDeclaration', from: '@jest/global', declarationSyntax: 'named' },
       render: { kind: 'importDeclaration', from: `@testing-library/${framework}`, declarationSyntax: 'named' },
       waitFor: { kind: 'importDeclaration', from: `@testing-library/${framework}`, declarationSyntax: 'named' },
       waitForElementToBeRemoved: { kind: 'importDeclaration', from: `@testing-library/${framework}`, declarationSyntax: 'named' },

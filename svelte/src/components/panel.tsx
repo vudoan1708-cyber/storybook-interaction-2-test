@@ -26,6 +26,7 @@ import Modal from './modal';
 // Type
 import {
   Actors,
+  APICallRecord,
   EventType,
   ExpectStatement,
   Framework,
@@ -45,10 +46,12 @@ import {
   Jest,
   debounce,
   FRAMEWORK_TO_LOGO,
+  ADDON_NAME,
+  API_CALL_EVENT_NAME,
 } from '../helpers';
 import { getFromLocalStorage, saveToLocalStorage } from '../helpers/settings';
 
-const noActorsFoundErrorMessage = '[interaction-2-test] Could not find an actor. Please make sure you define at least 1 actor through i2t-actors property in your stories file';
+const noActorsFoundErrorMessage = `[${ADDON_NAME}] Could not find an actor. Please make sure you define at least 1 actor through i2t-actors property in your stories file`;
 
 const H3Style = styled.h3`
   display: inline-flex;
@@ -112,6 +115,7 @@ export default ({
   const [ testFramework, setTestFramework ] = useState('Jest');
   const [ nonInteractiveElements, setNonInteractiveElements ] = useState<Set<Element>>(new Set());
   const [ potentialElementsToExpect, setPotentialElementsToExpect ] = useState<Set<Element>>(new Set());
+  const [ apiRecord, setApiRecord ] = useState<APICallRecord>({});
 
   const [ observer, setObserver ] = useState<MutationObserver>();
 
@@ -229,9 +233,11 @@ export default ({
       });
       setSteps((items) => [ ...items, recordedStep ]);
       // Check for imports or declaration
-      const declarationStatements = Jest.createDeclaration(result.target?.accessBy as JestQuery, componentRef.current.props);
-      setImports(declarationStatements?.importDeclaration ?? []);
-      setVariables(declarationStatements?.variableDeclaration ?? []);
+      if (result.target?.accessBy) {
+        const declarationStatements = Jest.createDeclaration(result.target?.accessBy as JestQuery, componentRef.current.props);
+        setImports(declarationStatements?.importDeclaration ?? []);
+        setVariables(declarationStatements?.variableDeclaration ?? []);
+      }
     }
   };
 
@@ -344,6 +350,17 @@ export default ({
     }
     saveToLocalStorage(settings ?? { status: 'off' });
   }, [ settings, storyRendered ]);
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      const { key, payload } = event.data || {};
+      if (key === API_CALL_EVENT_NAME) {
+        setApiRecord(payload);
+      }
+    }
+    window.addEventListener('message', handleMessage);
+
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
 
   return (
     <AddonPanel active={active}>
@@ -377,19 +394,20 @@ export default ({
 
       {/* Modal */}
       {
-        recordState === 'off' && potentialElementsToExpect.size > 0
+        recordState === 'off' && (potentialElementsToExpect.size > 0 || Object.keys(apiRecord).length > 0)
           ? <Modal
               elements={Array.from(potentialElementsToExpect)}
-              onClose={() => { resetElementSets.option2(); }}
-              onSubmit={({ element, negation, outcome }: { element: Element | null, negation: string, outcome: ExpectStatement }) => {
-                if (potentialElementsToExpect.size === 0) return;
+              apis={apiRecord}
+              onClose={() => { resetElementSets.option2(); setApiRecord({}); }}
+              onSubmit={({ target, negation, outcome }: { target: Element | string | null, negation: string, outcome: ExpectStatement }) => {
+                if (potentialElementsToExpect.size === 0 && Object.keys(apiRecord).length === 0) return;
                 processResult(
                   {
                     status: 'success',
                     target: {
                       eventType: 'expect',
-                      accessBy: 'queryByTestId',
-                      element,
+                      accessBy: typeof target === 'string' ? undefined : 'queryByTestId',
+                      element: target,
                       accessAtIndex: 0,
                     }
                   },
@@ -399,6 +417,7 @@ export default ({
                   },
                 );
                 resetElementSets.option2();
+                setApiRecord({});
               }} />
           : null
       }

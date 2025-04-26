@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEY } from '.';
+import { ADDON_NAME, LOCAL_STORAGE_KEY } from '.';
 import { RecordingSettings } from '../../types';
 
 export const getFromLocalStorage = (): RecordingSettings | null => {
@@ -18,6 +18,6 @@ export const saveToLocalStorage = (settings: RecordingSettings) => {
   try {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(settings as RecordingSettings));
   } catch {
-    console.error('[interaction-2-test] Cannot save the settings to the local storage')
+    console.error(`[${ADDON_NAME}] Cannot save the settings to the local storage`);
   }
 };

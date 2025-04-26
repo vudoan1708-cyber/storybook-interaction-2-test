@@ -59,4 +59,6 @@ What we can do is define our own “actors and scenes” from Storybook paramete
 - Scroll to the bottom every time a new Jest code has been added so that the UI doesn't jump.
 - Textarea input for specific `expect` outcomes.
 - Render the `expect`ed outcome to the code UI.
+## [26/04/2025]
+- Monkey patched fetch to collate all API calls (might just work if there is a request proxy tool used to mock request: tested with [fetch-mock](https://www.wheresrhys.co.uk/fetch-mock/)) and make the `expect` modal more powerful.
 <br />

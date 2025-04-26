@@ -31,7 +31,7 @@ const esbuild = require('esbuild');
      ...sharedOptions,
      entryPoints: [
        './svelte/src/manager.tsx',
-       // 'svelte/src/preview.ts'
+       'svelte/src/preview.ts',
      ],
      outdir: 'dist',
      platform: 'browser',

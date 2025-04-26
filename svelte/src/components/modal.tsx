@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import {
   Box,
   Button,
@@ -9,15 +9,17 @@ import {
   DialogContentText,
   DialogTitle,
   FormControlLabel,
+  Stack,
   Switch,
   TextareaAutosize,
+  Typography,
 } from '@mui/material';
 
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import styled from '@emotion/styled';
 
 import { EXPECT_STATEMENTS } from '../helpers';
-import { ExpectStatement } from '../../types';
+import { APICallRecord, ExpectStatement } from '../../types';
 
 type FlagElement = { element: Element, flag: boolean };
 
@@ -32,15 +34,21 @@ const Section = styled.section`
 
 export default ({
   elements,
+  apis,
   onClose,
   onSubmit,
 }: {
   elements: Element[],
+  apis: APICallRecord,
   onClose: () => void,
-  onSubmit: ({ element, negation, outcome }: { element: Element | null, negation: string, outcome: ExpectStatement }) => void,
+  onSubmit: ({ target, negation, outcome }: { target: Element | string | null, negation: string, outcome: ExpectStatement }) => void,
 }) => {
   const [ step, setStep ] = useState<number>(1);
   const [ flagElements, setFlagElements ] = useState<FlagElement[]>(elements.map((element) => ({ element, flag: false })));
+
+  const apiRef = useRef<Array<string>>(Object.keys(apis));
+
+  const [ apiKeys, setApiKeys ] = useState<Array<{ url: string, flag: boolean }>>(apiRef.current.map((api) => ({ url: api, flag: false })));
   const [ outcome, setOutcome ] = useState<ExpectStatement>();
   const [ not, setNot ] = useState<boolean>(false);
 
@@ -60,7 +68,7 @@ export default ({
     }
     if (step > 1) {
       onSubmit({
-        element: flagElements.find((object) => object.flag)?.element ?? null,
+        target: (flagElements.find((object) => object.flag)?.element || apiKeys.find((object) => object.flag)?.url) ?? null,
         negation: not ? 'not' : '',
         outcome: outcome as ExpectStatement,
       });
@@ -74,8 +82,9 @@ export default ({
   const previewSelection = (): ReactElement | null => {
     let jsxComponent: ReactElement | null = null;
 
-    const found = flagElements.find((object) => object.flag);
-    if (found) {
+    const foundElement = flagElements.find((object) => object.flag);
+    const foundApi = apiKeys.find((object) => object.flag);
+    if (foundElement || foundApi) {
       jsxComponent = (
         <Section>
           <i>expect </i>
@@ -83,8 +92,8 @@ export default ({
             sx={{
               margin: '4px',
             }}
-            variant={found.flag ? "filled" : "outlined"}
-            label={`${found.element.getAttribute('data-testid')}`} />
+            variant={(foundElement?.flag || foundApi?.flag) ? "filled" : "outlined"}
+            label={`${foundElement?.element?.getAttribute('data-testid') || foundApi?.url}`} />
 
           {
             not
@@ -140,14 +149,14 @@ export default ({
 
   return (
     <Dialog
-      open={elements.length > 0}
+      open={elements.length > 0 || apiRef.current.length > 0}
       onClose={onClose}>
       <DialogTitle>Expect()</DialogTitle>
       <DialogContent>
         <DialogContentText>
           {
             step === 1
-              ? 'One of these elements with the data-testid might be of your interest for the expect statement.'
+              ? 'One of the below options might be of your interest for the expect statement.'
               : 'Choose one of the following expression outcomes for your expect statement.'
           }
         </DialogContentText>
@@ -155,21 +164,69 @@ export default ({
         {
           step === 1
             ? (
-                flagElements.map((object, idx) => (
-                  <Chip
-                    key={idx}
-                    icon={object.flag ? <CheckCircleIcon /> : undefined}
-                    sx={{
-                      margin: '4px',
-                    }}
-                    variant={object.flag ? "filled" : "outlined"}
-                    label={`${object.element.getAttribute('data-testid')}`}
-                    clickable
-                    onClick={() => {
-                      // Reset
-                      setFlagElements(elements.map((element, resetIndex) => ({ element, flag: idx === resetIndex })));
-                    }} />
-                ))
+                <Stack spacing={2}>
+                  <section>
+                    {apiKeys.length
+                      ? (
+                          <Typography component="div" style={{ marginTop: '4px' }}>
+                            API calls
+                          </Typography>
+                        )
+                      : null
+                    }
+
+                    {apiKeys.map((key, idx) => (
+                      <Chip
+                        key={idx}
+                        icon={key.flag ? <CheckCircleIcon /> : undefined}
+                        sx={{
+                          margin: '4px',
+                        }}
+                        variant={key.flag ? "filled" : "outlined"}
+                        label={
+                          <Typography variant="body2" component="span">
+                            <b>[{apis[key.url].method}]</b> {key.url}
+                          </Typography>
+                        }
+                        clickable
+                        onClick={(e) => {
+                          e.persist();
+                          setApiKeys(apiRef.current.map((k, resetIndex) => ({ url: k, flag: idx === resetIndex })));
+                          // Reset
+                          setFlagElements(elements.map((element) => ({ element, flag: false })));
+                        }} />
+                    ))}
+                  </section>
+
+                  <section>
+                    {flagElements.length > 0
+                      ? (
+                          <Typography component="div" style={{ marginTop: '4px' }}>
+                            <code>data-testid</code>s of elements
+                          </Typography>
+                        )
+                      : null
+                    }
+
+                    {flagElements.map((object, idx) => (
+                      <Chip
+                        key={idx}
+                        icon={object.flag ? <CheckCircleIcon /> : undefined}
+                        sx={{
+                          margin: '4px',
+                        }}
+                        variant={object.flag ? "filled" : "outlined"}
+                        label={`${object.element.getAttribute('data-testid')}`}
+                        clickable
+                        onClick={(e) => {
+                          e.persist();
+                          // Reset
+                          setApiKeys(apiRef.current.map((k) => ({ url: k, flag: false })));
+                          setFlagElements(elements.map((element, resetIndex) => ({ element, flag: idx === resetIndex })));
+                        }} />
+                    ))}
+                  </section>
+                </Stack>
               )
             : <>
                 <div>
@@ -216,7 +273,9 @@ export default ({
         </Button>
         <Button
           type="submit"
-          disabled={step === 1 ? flagElements.every((object) => !object.flag) : !outcome?.keyword}
+          disabled={step === 1
+            ? (flagElements.every((object) => !object.flag) && apiKeys.every((object) => !object.flag))
+            : !outcome?.keyword}
           onClick={increment}>
           Select
         </Button>

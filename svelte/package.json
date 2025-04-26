@@ -15,7 +15,8 @@
   "exports": {
     "./package.json": "./package.json",
     ".": "./dist/manager.js",
-    "./preset": "./dist/preset.js"
+    "./preset": "./dist/preset.js",
+    "./preview": "./dist/preview.js"
   },
   "files": [
     "package.json",

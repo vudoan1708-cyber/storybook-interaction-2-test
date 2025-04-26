@@ -35,15 +35,15 @@ export default class Jest {
   private static __createArgs(
     accessBy: JestQuery,
     accessAtIndex: number,
-    testId?: string | null,
+    target?: string | null,
   ): Argument {
     if (accessBy === 'queryByTestId') {
-      return `${accessBy}('${testId}')`;
+      return `${accessBy}('${target}')`;
     }
     if (accessBy === 'queryAllByTestId') {
-      return `${accessBy}('${testId}')[${accessAtIndex}]`;
+      return `${accessBy}('${target}')[${accessAtIndex}]`;
     }
-    return '';
+    return `'${target ?? ''}'`;
   }
   public static click({ userEvent }: { userEvent: UserEventResult['target'] }): JestExpressionStatement {
     return {
@@ -55,7 +55,7 @@ export default class Jest {
           this.__createArgs(
             userEvent?.accessBy as JestQuery,
             userEvent?.accessAtIndex ?? 0,
-            userEvent?.element?.getAttribute('data-testid'),
+            (userEvent?.element as HTMLElement | Element)?.getAttribute('data-testid'),
           )
         ],
       },
@@ -71,7 +71,7 @@ export default class Jest {
           this.__createArgs(
             userEvent?.accessBy as JestQuery,
             userEvent?.accessAtIndex ?? 0,
-            userEvent?.element?.getAttribute('data-testid'),
+            (userEvent?.element as HTMLElement | Element)?.getAttribute('data-testid'),
           ),
           `'${value}'`,
         ],
@@ -88,7 +88,7 @@ export default class Jest {
           this.__createArgs(
             userEvent?.accessBy as JestQuery,
             userEvent?.accessAtIndex ?? 0,
-            userEvent?.element?.getAttribute('data-testid'),
+            (userEvent?.element as HTMLElement | Element)?.getAttribute('data-testid'),
           ),
           {
             type: 'object',
@@ -117,7 +117,7 @@ export default class Jest {
           this.__createArgs(
             userEvent?.accessBy as JestQuery,
             userEvent?.accessAtIndex ?? 0,
-            userEvent?.element?.getAttribute('data-testid'),
+            (userEvent?.element as HTMLElement | Element)?.getAttribute('data-testid'),
           ),
         ],
       },
@@ -132,7 +132,7 @@ export default class Jest {
           this.__createArgs(
             userEvent?.accessBy as JestQuery,
             userEvent?.accessAtIndex ?? 0,
-            userEvent?.element?.getAttribute('data-testid'),
+            (userEvent?.element as HTMLElement | Element)?.getAttribute('data-testid'),
           ),
         ],
       }
@@ -175,7 +175,7 @@ export default class Jest {
           this.__createArgs(
             userEvent?.accessBy as JestQuery,
             userEvent?.accessAtIndex ?? 0,
-            userEvent?.element?.getAttribute('data-testid'),
+            typeof userEvent?.element === 'string' ? userEvent?.element : userEvent?.element?.getAttribute('data-testid'),
           ),
         ],
         chained: createChainingOperations(values, 0),
