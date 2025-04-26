@@ -34,3 +34,5 @@ npm i -D interaction-2-test
 - Expect statement is weak at guessing user intents, and hence is not very reliable at the moment.
 ### 1.2.0
 - Monkey patched `fetch` to collate API calls and make the `expect` stage more powerful at predicting expected outcome.
+### 1.2.1
+- preview file was loaded twice, it seems that defining it in the `exports` field from `package.json` automatically imports it, so removing the `previewAnnotations` seems to fix it.

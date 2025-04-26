@@ -2,7 +2,7 @@
   "name": "interaction-2-test",
   "version": "1.2.0",
   "description": "A storybook addon that generates unit test (Jest for now) based on user interaction on the Storybook component UI",
-  "main": "./dist/preset.js",
+  "main": "./preset.js",
   "sideEffects": true,
   "scripts": {
     "ts:init": "tsc --init",
@@ -32,7 +32,7 @@
     "url": "https://github.com/vudoan1708-cyber/storybook-interaction-2-test"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "peerDependencies": {
     "@storybook/addons": "^6.5.16",
     "@storybook/components": "^6.5.16",
@@ -66,17 +66,6 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "bundler": {
-    "managerEntries": [
-      "src/manager.tsx"
-    ],
-    "previewEntries": [
-      "src/preview.ts"
-    ],
-    "nodeEntries": [
-      "src/preset.ts"
-    ]
   },
   "storybook": {
     "displayName": "Interaction 2 Test",

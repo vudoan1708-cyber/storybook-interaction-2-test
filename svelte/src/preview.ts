@@ -10,7 +10,7 @@ const windowPostMessageDebounced = debounce(() => {
     },
     window.origin,
   );
-}, 200);
+}, 150);
 
 requestAnimationFrame(() => {
   const originalFetch = window.fetch;
@@ -31,7 +31,7 @@ requestAnimationFrame(() => {
     window.__apiCallRecord[url as string] = {
       method: init?.method as APICallRecord[string]['method'] || 'GET',
       requestBody: init?.body,
-      responseBody: response.status === 204 ? undefined : await response.json(),
+      // responseBody: response.status === 204 ? undefined : await response.json(),
       times: (window.__apiCallRecord[url as string]?.times || 0) + 1,
       status: response.status,
     };

@@ -32,7 +32,7 @@
      "url": "https://github.com/vudoan1708-cyber/storybook-interaction-2-test/tree/master/svelte"
    },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "peerDependencies": {
     "@storybook/addons": "^6.5.16",
     "@storybook/components": "^6.5.16",
@@ -64,14 +64,6 @@
   },
   "publishConfig": {
      "access": "public"
-   },
-   "bundler": {
-     "managerEntries": [
-       "src/manager.tsx"
-     ],
-     "nodeEntries": [
-       "src/preset.ts"
-     ]
    },
    "storybook": {
      "displayName": "Interaction 2 Test",

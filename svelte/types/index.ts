@@ -125,7 +125,7 @@ export type APICallRecord = {
   [url: string]: {
     method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
     requestBody: BodyInit | null | undefined;
-    responseBody: any;
+    responseBody?: any;
     times: number;
     status: number;
   };
