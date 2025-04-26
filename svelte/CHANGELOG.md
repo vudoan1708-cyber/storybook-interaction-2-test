@@ -61,4 +61,6 @@ What we can do is define our own “actors and scenes” from Storybook paramete
 - Render the `expect`ed outcome to the code UI.
 ## [26/04/2025]
 - Monkey patched fetch to collate all API calls (might just work if there is a request proxy tool used to mock request: tested with [fetch-mock](https://www.wheresrhys.co.uk/fetch-mock/)) and make the `expect` modal more powerful.
+- Fixed the issue with `preview` being loaded twice.
+- Auto create default values for the build of `expect` statement, particularly useful with the API calls, making the `expect` builder more powerful.
 <br />

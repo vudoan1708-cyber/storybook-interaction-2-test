@@ -1,4 +1,4 @@
-import { ExpectStatement } from "../../types";
+import { APICallRecord, ExpectStatement } from "../../types";
 
 export const ADDON_NAME = 'interaction-2-test';
 
@@ -33,3 +33,8 @@ export const EXPECT_STATEMENTS: Array<ExpectStatement> = [
   { keyword: 'toHaveBeenCalledWith', argumentTypes: [ 'any' ] },
   { keyword: 'toHaveBeenCalledTimes', argumentTypes: [ 'number' ] },
 ];
+
+export const EXPECT_OUTCOME_API_CALL_MAPPER: { [x in ExpectStatement['keyword']]?: keyof APICallRecord[string] } = {
+  toHaveBeenCalledTimes: 'times',
+  toHaveBeenCalledWith: 'requestBody',
+};

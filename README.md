@@ -35,4 +35,6 @@ npm i -D interaction-2-test
 ### 1.2.0
 - Monkey patched `fetch` to collate API calls and make the `expect` stage more powerful at predicting expected outcome.
 ### 1.2.1
-- preview file was loaded twice, it seems that defining it in the `exports` field from `package.json` automatically imports it, so removing the `previewAnnotations` seems to fix it.
+- `preview` file was loaded twice, it seems that defining it in the `exports` field from `package.json` automatically imports it, so removing the `previewAnnotations` seems to fix it.
+### 1.3.0
+- Default values for the `textarea` field when building an `expect` statement, particularly, from the collection of API calls, all the info, such as url, call times, call methods...

@@ -103,7 +103,7 @@ export type JestExpressionStatement = {
 };
 
 export type JestImportPath =
-  '@jest/global'
+  | '@jest/global'
   | '@testing-library/jest-dom/extend-expect'
   | '@testing-library/svelte'
   | '@testing-library/react'
@@ -118,7 +118,23 @@ export type DeclarationTemplate = {
   };
 };
 
-export type ExpectStatement = { keyword: string; argumentTypes: Array<any>; arguments?: Array<any> };
+export type ExpectStatement = {
+  keyword:
+  | 'toBeInTheDocument'
+  | 'toBeNull'
+  | 'toBeUndefined'
+  | 'toBe'
+  | 'toHaveTextContent'
+  | 'toHaveStyle'
+  | 'toHaveLength'
+  | 'toEqual'
+  | 'toStrictEqual'
+  | 'toHaveBeenCalled'
+  | 'toHaveBeenCalledWith'
+  | 'toHaveBeenCalledTimes';
+  argumentTypes: Array<any>;
+  arguments?: Array<any>;
+};
 
 // API
 export type APICallRecord = {

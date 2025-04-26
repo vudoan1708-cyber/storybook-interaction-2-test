@@ -67,8 +67,8 @@ export default ({
           }
       }`;
     }
-    if (typeof arg === 'string') {
-      return arg;
+    if (typeof arg === 'string' || typeof arg === 'number') {
+      return arg.toString();
     }
     return '';
   }

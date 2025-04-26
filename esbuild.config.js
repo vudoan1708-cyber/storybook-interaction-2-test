@@ -36,6 +36,9 @@ const esbuild = require('esbuild');
      outdir: 'dist',
      platform: 'browser',
      target: ['es2017'],
+     bundle: true,
+     minify: true,
+     treeShaking: true,
      external: ['react', 'react-dom', 'svelte', '@storybook/addons', '@storybook/components'],
      format: 'cjs',
    });
@@ -48,6 +51,9 @@ const esbuild = require('esbuild');
      outdir: 'dist',
      platform: 'node',
      target: ['node14'],
+     bundle: true,
+     minify: true,
+     treeShaking: true,
      external: ['svelte'],
      format: 'cjs',
    });

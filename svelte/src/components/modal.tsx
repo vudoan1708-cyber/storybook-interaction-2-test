@@ -18,7 +18,7 @@ import {
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import styled from '@emotion/styled';
 
-import { EXPECT_STATEMENTS } from '../helpers';
+import { EXPECT_OUTCOME_API_CALL_MAPPER, EXPECT_STATEMENTS } from '../helpers';
 import { APICallRecord, ExpectStatement } from '../../types';
 
 type FlagElement = { element: Element, flag: boolean };
@@ -45,7 +45,6 @@ export default ({
 }) => {
   const [ step, setStep ] = useState<number>(1);
   const [ flagElements, setFlagElements ] = useState<FlagElement[]>(elements.map((element) => ({ element, flag: false })));
-
   const apiRef = useRef<Array<string>>(Object.keys(apis));
 
   const [ apiKeys, setApiKeys ] = useState<Array<{ url: string, flag: boolean }>>(apiRef.current.map((api) => ({ url: api, flag: false })));
@@ -54,6 +53,7 @@ export default ({
 
   const backOrClose = () => {
     if (step === 1) {
+      setOutcome((statement) => ({ ...statement, arguments: [] } as ExpectStatement));
       onClose();
       return;
     }
@@ -64,6 +64,9 @@ export default ({
   const increment = () => {
     if (step === 1) {
       setStep(step + 1);
+
+      // assume this is step 2 where the expect stage comes up so we create default value coming from the API call record
+      createDefaultValue(outcome as ExpectStatement);
       return;
     }
     if (step > 1) {
@@ -77,6 +80,21 @@ export default ({
 
   const onToggle = () => {
     setNot(!not);
+  };
+
+  const createDefaultValue = (outcome: ExpectStatement) => {
+    if (!outcome) return;
+
+    const foundApi = apiKeys.find((key) => key.flag);
+    if (!foundApi) return;
+
+    const keyToGetFromApiCallRecord = EXPECT_OUTCOME_API_CALL_MAPPER[outcome.keyword];
+    if (keyToGetFromApiCallRecord) {
+      const defaultInputValue = apis[foundApi.url][keyToGetFromApiCallRecord];
+      if (!defaultInputValue) return;
+
+      setOutcome({ ...outcome, arguments: [ defaultInputValue ] } as ExpectStatement);
+    }
   };
 
   const previewSelection = (): ReactElement | null => {
@@ -126,9 +144,12 @@ export default ({
                                         borderRadius: '16px',
                                         fontSize: '0.75rem',
                                         lineHeight: 1,
-                                        whiteSpace: 'nowrap',
                                         minWidth: 24,
                                         textAlign: 'center',
+                                        overflow: 'hidden',
+                                        whiteSpace: 'nowrap',
+                                        textOverflow: 'ellipsis',
+                                        maxWidth: '370px',
                                       }}>
                                       {outcome.arguments}
                                     </Box>
@@ -244,6 +265,8 @@ export default ({
                       onClick={() => {
                         // Reset
                         setOutcome({ ...statement, arguments: [] });
+                        // Provide default value to the textarea input if any
+                        createDefaultValue(statement);
                       }} />
                   ))
                 )}
@@ -259,7 +282,7 @@ export default ({
                         value={outcome?.arguments?.[0] ?? ''}
                         onChange={(e) => {
                           e.persist();
-                          setOutcome((current) => ({ ...current, arguments: [ e.target.value ].filter(Boolean) } as ExpectStatement))
+                          setOutcome((current) => ({ ...current, arguments: [ e.target.value ].filter(Boolean) } as ExpectStatement));
                         }} />
                       )
                     : null
