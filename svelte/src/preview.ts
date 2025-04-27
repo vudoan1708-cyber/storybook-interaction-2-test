@@ -1,6 +1,7 @@
-import { API_CALL_EVENT_NAME, debounce } from './helpers';
+import { ADDON_NAME, API_CALL_EVENT_NAME, debounce } from './helpers';
 
 import type { APICallRecord } from '../types';
+import { SET_CURRENT_STORY, STORY_CHANGED } from 'storybook/internal/core-events';
 
 const windowPostMessageDebounced = debounce(() => {
   window.parent.postMessage(
@@ -12,16 +13,19 @@ const windowPostMessageDebounced = debounce(() => {
   );
 }, 150);
 
-const patchedFetch = () => {
-  if (window.__fetchPatched || typeof window.fetch !== 'function') return;
-  window.__fetchPatched = true;
+// Keep the wrapped fetch handler around for identity checks
+let fetchWrapper: typeof fetch | null = null;
 
+const patchedFetch = () => {
   const originalFetch = window.fetch;
 
   window.__apiCallRecord = {} as APICallRecord;
 
+  if (originalFetch === fetchWrapper) return;
+
   // Monkey patching fetch
   window.fetch = async (...args) => {
+    console.warn(`[${ADDON_NAME}] 🔧 Patching window.fetch: `, args);
     if (!window.__apiCallRecord) window.__apiCallRecord = {};
 
     const [ url, init ] = args;
@@ -42,10 +46,11 @@ const patchedFetch = () => {
 
     return cloned;
   };
+
+  // Overwrite window.fetch with our new wrapper
+  fetchWrapper = window.fetch;
 };
 
-requestAnimationFrame(() => {
-  patchedFetch();
-});
+patchedFetch();
 
-export const parameters = {};
+window.addEventListener('message', patchedFetch);

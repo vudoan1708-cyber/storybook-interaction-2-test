@@ -46,8 +46,6 @@
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^7.0.2",
     "@mui/material": "^7.0.2",
-    "@storybook/addons": "^6.5.16",
-    "@storybook/components": "^6.5.16",
     "@storybook/core-events": "^8.6.12",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
