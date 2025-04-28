@@ -25,7 +25,10 @@
     "CHANGELOG.md"
   ],
   "keywords": [
-    "storybook-addons"
+    "storybook-addons",
+    "interaction",
+    "jest",
+    "test"
   ],
   "repository": {
     "type": "git",
@@ -53,8 +56,6 @@
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^7.0.2",
     "@mui/material": "^7.0.2",
-    "@storybook/addons": "^6.5.16",
-    "@storybook/components": "^6.5.16",
     "ws": "^8.18.1"
   },
   "devDependencies": {

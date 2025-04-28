@@ -42,3 +42,6 @@ npm i -D interaction-2-test
 - Minor updates on the import statements...
 ### 1.3.2
 - `fetch` will now stay latched on every story change event. Although new issue found with some early calls cannot be picked up by the preview.
+### 1.3.3
+- Add a warning to the expect statement builder.
+- Fix the auto-record settings on first load.

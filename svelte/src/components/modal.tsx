@@ -1,5 +1,6 @@
 import React, { ReactElement, useRef, useState } from 'react';
 
+import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
@@ -188,9 +189,23 @@ export default ({
                   <section>
                     {apiKeys.length
                       ? (
-                          <Typography component="div" style={{ marginTop: '4px' }}>
-                            API calls
-                          </Typography>
+                          <>
+                            <Typography component="div" style={{ marginTop: '4px' }}>
+                              API calls
+                            </Typography>
+                            <Alert
+                              severity="warning"
+                              sx={{
+                                margin: '4px 0',
+                                '.MuiAlert-message': {
+                                  padding: '4px 0',
+                                }
+                              }}>
+                              <small>
+                                Some early API calls may not be captured due to Storybook environment and mock libraries (if any).
+                              </small>
+                            </Alert>
+                          </>
                         )
                       : null
                     }

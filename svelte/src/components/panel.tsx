@@ -343,10 +343,13 @@ export default ({
     componentRef.current = component;
   }, [ component ]);
   useEffect(() => {
+    if (settings?.status === undefined) {
+      setSettings({ status: 'off' });
+    }
     if (settings?.status === 'on' && storyRendered) {
       setRecordState('on');
     }
-    saveToLocalStorage(settings ?? { status: 'off' });
+    saveToLocalStorage(settings || { status: 'off' });
   }, [ settings, storyRendered ]);
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -392,7 +395,7 @@ export default ({
 
       {/* Modal */}
       {
-        recordState === 'off' && (potentialElementsToExpect.size > 0 || Object.keys(apiRecord).length > 0)
+        recordState === 'off' && settings?.status === 'on' && (potentialElementsToExpect.size > 0 || Object.keys(apiRecord).length > 0)
           ? <Modal
               elements={Array.from(potentialElementsToExpect)}
               apis={apiRecord}

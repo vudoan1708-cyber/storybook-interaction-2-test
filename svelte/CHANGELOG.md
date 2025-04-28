@@ -66,4 +66,6 @@ What we can do is define our own “actors and scenes” from Storybook paramete
 ## [27/04/2025]
 - `fetch` will now be reloaded whenever a developer changes the story.
 - New issue found with some early calls cannot be picked up on the preview side, need further investigation on potentially new mock request tech like `msw`.
+## [28/04/2025]
+- Tried so many different ways to ensure the addon can patch fetch or at least play nicely with any mock library (`fetch-mock` in my case) and it didn't work. I even once tried out Service Worker but fetch-mock was so powerful, it swallowed all the necessary endpoints from components leaving just the internal Storybook server calls left to record. So I decided to live with the bug, but added in a warning that some early calls might be missed due to SB or any mock libraries that can interfere with fetch.
 <br />
