@@ -75,4 +75,4 @@ Example:
 ### 1.4.1
 - Remove logs.
 ### 1.4.2
-- Function call times tracker was missed, fix it so it can track the number of times a endpoint has been caled.
+- Function call times tracker was missed, fix it so it can track the number of times an endpoint has been called.

@@ -322,7 +322,6 @@ export default ({
   }, [ recordState ]);
   useEffect(() => {
     actorsRef.current = actors;
-    console.log(actors)
     if (!actorsRef.current && storyRendered) {
       setAlert([
         {
