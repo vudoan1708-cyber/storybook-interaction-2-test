@@ -17,8 +17,6 @@ Expect statement is weak at guessing user intents, and hence is not very reliabl
 ## Dev Notes
 When `npm install` the local path to the addon, this creates a symlink that can automatically updates the addon from the storybook project side. However, as soon as, the instance of your IDE is closed (for whatever reason), you will need to delete `package.json` as well as `node_modules`, and reinstall the addon again so it won't cache.
 
-## Release Notes
-
 ## References
 [Svelte Logo](https://en.m.wikipedia.org/wiki/File:Svelte_Logo.svg)
 
@@ -33,11 +31,20 @@ npm i -D interaction-2-test
 ## Usage
 After installing the package as a dev dependency, you have 2 options to define actors:
 1. Locally under the parameters object in the Meta function / component for each `stories` file.
-2. Globally at the root of a storybook project (the file is `i2t.config.json` and needs to have the exact same data structure defined in the Vocabulary section)
+```js
+parameters={{
+  layout: 'padded',
+  'i2t-actors': {
+    'native-checkbox': 'click',
+    button: 'click',
+  },
+}}
+```
+2. Globally at the root of a storybook project (the file is `i2t.config.json` and needs to have the exact same data structure defined in the Vocabulary `Scene` section)
 
 ## Vocabulary
 - Actors: Your `data-testid`s of elements that involve in a recording session.
-- Scene: What your `actors` will perform in a recording session (input, change, click, hover,...)<br />
+- Scenes: What your `actors` will perform in a recording session (input, change, click, hover,...)<br />
 Example:
 ```json
 {
@@ -46,6 +53,7 @@ Example:
 }
 ```
 
+## Release Notes
 ### 1.1.0
 - Expect statement is weak at guessing user intents, and hence is not very reliable at the moment.
 ### 1.2.0
@@ -66,3 +74,5 @@ Example:
 - Allow defining actors globally in a repo instead of locally in each stories file.
 ### 1.4.1
 - Remove logs.
+### 1.4.2
+- Function call times tracker was missed, fix it so it can track the number of times a endpoint has been caled.

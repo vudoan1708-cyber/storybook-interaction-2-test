@@ -71,4 +71,5 @@ What we can do is define our own “actors and scenes” from Storybook paramete
 ## [02/05/2025]
 - `window.__apiCallRecord` object now needs both call method and call url to access the properties for each call (this is so that if 2 calls with the same URL but different methods are called, so say a PUT and a GET for https://your-api.com)
 - Allow a global config file to define actors rather than going into each stories file and potentially define the same actors across a repo.
+- Fix the time tracker for endpoint calls that was left out during the refactoring of the `window.__apiCallRecord`.
 <br />

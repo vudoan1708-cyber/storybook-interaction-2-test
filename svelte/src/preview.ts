@@ -41,7 +41,7 @@ const patchedFetch = () => {
       method: method as APICallRecord[string]['method'] || 'GET',
       requestBody: init?.body,
       // responseBody: response.status === 204 ? undefined : await response.json(),
-      times: (window.__apiCallRecord[url as string]?.times || 0) + 1,
+      times: (window.__apiCallRecord[`[${method}] ${url}` as string]?.times || 0) + 1,
       status: response.status,
     };
     windowPostMessageDebounced();
