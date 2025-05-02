@@ -35,8 +35,10 @@ const patchedFetch = () => {
     // Response is a stream, and can only be consumed once, do this so we have a reference of the response later on
     const cloned = response.clone();
 
-    window.__apiCallRecord[url as string] = {
-      method: init?.method as APICallRecord[string]['method'] || 'GET',
+    const method = init?.method;
+
+    window.__apiCallRecord[`[${method}] ${url}` as string] = {
+      method: method as APICallRecord[string]['method'] || 'GET',
       requestBody: init?.body,
       // responseBody: response.status === 204 ? undefined : await response.json(),
       times: (window.__apiCallRecord[url as string]?.times || 0) + 1,

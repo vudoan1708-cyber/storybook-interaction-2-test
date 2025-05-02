@@ -30,6 +30,22 @@ Use as a dev dependency:
 npm i -D interaction-2-test
 ```
 
+## Usage
+After installing the package as a dev dependency, you have 2 options to define actors:
+1. Locally under the parameters object in the Meta function / component for each `stories` file.
+2. Globally at the root of a storybook project (the file is `i2t.config.json` and needs to have the exact same data structure defined in the Vocabulary section)
+
+## Vocabulary
+- Actors: Your `data-testid`s of elements that involve in a recording session.
+- Scene: What your `actors` will perform in a recording session (input, change, click, hover,...)<br />
+Example:
+```json
+{
+  'button-testid': 'click',
+  'input-testid': 'change'
+}
+```
+
 ### 1.1.0
 - Expect statement is weak at guessing user intents, and hence is not very reliable at the moment.
 ### 1.2.0
@@ -45,3 +61,6 @@ npm i -D interaction-2-test
 ### 1.3.3
 - Add a warning to the expect statement builder.
 - Fix the auto-record settings on first load.
+### 1.4.0
+- Fix issue with endpoint calls of the same URL but different methods get swallowed.
+- Allow defining actors globally in a repo instead of locally in each stories file.

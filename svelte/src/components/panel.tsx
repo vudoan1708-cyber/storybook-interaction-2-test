@@ -104,6 +104,7 @@ export default ({
 }) => {
   const [ settings, setSettings ] = useState<RecordingSettings | null>(initialSettings);
   const [ recordState, setRecordState ] = useState<Status>(settings?.status ?? 'off');
+  const [ manualToggleOff, setManualToggleOff ] = useState<boolean>(false);
 
   const [ alerts, setAlert ] = useState<Array<{ message: string, style: AlertProps['severity'] }>>([]);
   const [ steps, setSteps ] = useState<Array<JestExpressionStatement>>([]);
@@ -295,6 +296,7 @@ export default ({
     on: () => {
       toggleListener('on');
       recordChangesToDomTree('on');
+      setManualToggleOff(false);
     },
     off: () => {
       // Remove event listener and stuff
@@ -320,6 +322,7 @@ export default ({
   }, [ recordState ]);
   useEffect(() => {
     actorsRef.current = actors;
+    console.log(actors)
     if (!actorsRef.current && storyRendered) {
       setAlert([
         {
@@ -395,7 +398,7 @@ export default ({
 
       {/* Modal */}
       {
-        recordState === 'off' && settings?.status === 'on' && (potentialElementsToExpect.size > 0 || Object.keys(apiRecord).length > 0)
+        manualToggleOff && (potentialElementsToExpect.size > 0 || Object.keys(apiRecord).length > 0)
           ? <Modal
               elements={Array.from(potentialElementsToExpect)}
               apis={apiRecord}
@@ -433,6 +436,10 @@ export default ({
             startIcon={recordState === 'off' ? <RadioButtonCheckedIcon color="error" /> : <StopIcon />}
             onClick={() => {
               setRecordState((prev) => prev === 'off' ? 'on' : 'off');
+              // This is to identify whether the record button has been manually turnt off by the user
+              if (recordState === 'on') {
+                setManualToggleOff(true);
+              }
             }}>
             {recordState === 'off' ? 'Record' : 'Stop'}
           </Button>

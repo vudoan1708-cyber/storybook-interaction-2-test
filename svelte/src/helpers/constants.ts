@@ -11,6 +11,9 @@ export const WS_PORT = 42999;
 
 export const DEFINE_ACTORS = 'i2t-actors';
 
+export const CONFIG_FILE_NAME = 'i2t.config.json';
+export const GLOBAL_ACTORS_IDENTIFIER = 'GLOBAL_ACTORS';
+
 export const FRAMEWORK_TO_LOGO = {
   svelte: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/Svelte_Logo.svg',
   react: '',
@@ -34,7 +37,7 @@ export const EXPECT_STATEMENTS: Array<ExpectStatement> = [
   { keyword: 'toHaveBeenCalledTimes', argumentTypes: [ 'number' ] },
 ];
 
-export const EXPECT_OUTCOME_API_CALL_MAPPER: { [x in ExpectStatement['keyword']]?: keyof APICallRecord[string] } = {
+export const EXPECT_OUTCOME_API_CALL_MAPPER: { [x in ExpectStatement['keyword']]?: keyof APICallRecord[string][keyof APICallRecord[string]] } = {
   toHaveBeenCalledTimes: 'times',
   toHaveBeenCalledWith: 'requestBody',
 };

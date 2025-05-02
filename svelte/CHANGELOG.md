@@ -68,4 +68,7 @@ What we can do is define our own “actors and scenes” from Storybook paramete
 - New issue found with some early calls cannot be picked up on the preview side, need further investigation on potentially new mock request tech like `msw`.
 ## [28/04/2025]
 - Tried so many different ways to ensure the addon can patch fetch or at least play nicely with any mock library (`fetch-mock` in my case) and it didn't work. I even once tried out Service Worker but fetch-mock was so powerful, it swallowed all the necessary endpoints from components leaving just the internal Storybook server calls left to record. So I decided to live with the bug, but added in a warning that some early calls might be missed due to SB or any mock libraries that can interfere with fetch.
+## [02/05/2025]
+- `window.__apiCallRecord` object now needs both call method and call url to access the properties for each call (this is so that if 2 calls with the same URL but different methods are called, so say a PUT and a GET for https://your-api.com)
+- Allow a global config file to define actors rather than going into each stories file and potentially define the same actors across a repo.
 <br />

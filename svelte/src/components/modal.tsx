@@ -47,7 +47,22 @@ export default ({
   const [ flagElements, setFlagElements ] = useState<FlagElement[]>(elements.map((element) => ({ element, flag: false })));
   const apiRef = useRef<Array<string>>(Object.keys(apis));
 
-  const [ apiKeys, setApiKeys ] = useState<Array<{ url: string, flag: boolean }>>(apiRef.current.map((api) => ({ url: api, flag: false })));
+  const extract = (url: string, what = 'url') => {
+    const matchingTemplate = `[${apis[url].method}]`;
+    if (what === 'url') {
+      // Add 1 to ignore the space before the url. E.g: [PUT] /<url>
+      return url.slice(matchingTemplate.length + 1, url.length);
+    }
+    if (what === 'method') {
+      return url.slice(0, matchingTemplate.length);
+    }
+    return '';
+  };
+  const [ apiKeys, setApiKeys ] = useState<Array<{ url: string, method: APICallRecord[string]['method'], flag: boolean }>>(apiRef.current.map((url) => ({
+    url: extract(url, 'url'),
+    method: extract(url, 'method') as APICallRecord[string]['method'],
+    flag: false,
+  })));
   const [ outcome, setOutcome ] = useState<ExpectStatement>();
   const [ not, setNot ] = useState<boolean>(false);
 
@@ -88,9 +103,13 @@ export default ({
     const foundApi = apiKeys.find((key) => key.flag);
     if (!foundApi) return;
 
-    const keyToGetFromApiCallRecord = EXPECT_OUTCOME_API_CALL_MAPPER[outcome.keyword];
+    const keyToGetFromApiCallRecord = EXPECT_OUTCOME_API_CALL_MAPPER[outcome.keyword] as keyof APICallRecord[string];
     if (keyToGetFromApiCallRecord) {
-      const defaultInputValue = apis[foundApi.url][keyToGetFromApiCallRecord];
+
+      console.log('apis', apis);
+      console.log('keyToGetFromApiCallRecord', keyToGetFromApiCallRecord);
+      console.log('`${foundApi.method} ${foundApi.url}`', `${foundApi.method} ${foundApi.url}`);
+      const defaultInputValue = apis[`${foundApi.method} ${foundApi.url}`][keyToGetFromApiCallRecord];
       if (!defaultInputValue) return;
 
       setOutcome({ ...outcome, arguments: [ defaultInputValue ] } as ExpectStatement);
@@ -220,13 +239,13 @@ export default ({
                         variant={key.flag ? "filled" : "outlined"}
                         label={
                           <Typography variant="body2" component="span">
-                            <b>[{apis[key.url].method}]</b> {key.url}
+                            <b>{key.method}</b> {key.url}
                           </Typography>
                         }
                         clickable
                         onClick={(e) => {
                           e.persist();
-                          setApiKeys(apiRef.current.map((k, resetIndex) => ({ url: k, flag: idx === resetIndex })));
+                          setApiKeys(apiRef.current.map((k, resetIndex) => ({ url: extract(k, 'url'), method: extract(k, 'method') as APICallRecord[string]['method'], flag: idx === resetIndex })));
                           // Reset
                           setFlagElements(elements.map((element) => ({ element, flag: false })));
                         }} />
@@ -256,7 +275,7 @@ export default ({
                         onClick={(e) => {
                           e.persist();
                           // Reset
-                          setApiKeys(apiRef.current.map((k) => ({ url: k, flag: false })));
+                          setApiKeys(apiRef.current.map((k) => ({ url: extract(k, 'url'), method: extract(k, 'method') as APICallRecord[string]['method'], flag: false })));
                           setFlagElements(elements.map((element, resetIndex) => ({ element, flag: idx === resetIndex })));
                         }} />
                     ))}
