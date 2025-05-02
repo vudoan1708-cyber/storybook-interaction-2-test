@@ -105,10 +105,6 @@ export default ({
 
     const keyToGetFromApiCallRecord = EXPECT_OUTCOME_API_CALL_MAPPER[outcome.keyword] as keyof APICallRecord[string];
     if (keyToGetFromApiCallRecord) {
-
-      console.log('apis', apis);
-      console.log('keyToGetFromApiCallRecord', keyToGetFromApiCallRecord);
-      console.log('`${foundApi.method} ${foundApi.url}`', `${foundApi.method} ${foundApi.url}`);
       const defaultInputValue = apis[`${foundApi.method} ${foundApi.url}`][keyToGetFromApiCallRecord];
       if (!defaultInputValue) return;
 

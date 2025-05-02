@@ -10,7 +10,7 @@
     "check": "tsc --noEmit",
     "dev": "node ./esbuild.config.js",
     "build": "node ./esbuild.config.js --bundle",
-    "release": "npm version minor --no-git-tag-version -m \"chore(release): bump to %s\" && git add package*.json && git commit -m \"chore(release): bump to $(node -p 'require(\"./package.json\").version')\" && node push-tag.js"
+    "release": "npm version patch --no-git-tag-version -m \"chore(release): bump to %s\" && git add package*.json && git commit -m \"chore(release): bump to $(node -p 'require(\"./package.json\").version')\" && node push-tag.js"
   },
   "exports": {
     "./package.json": "./package.json",

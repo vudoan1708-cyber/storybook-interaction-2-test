@@ -64,3 +64,5 @@ Example:
 ### 1.4.0
 - Fix issue with endpoint calls of the same URL but different methods get swallowed.
 - Allow defining actors globally in a repo instead of locally in each stories file.
+### 1.4.1
+- Remove logs.
